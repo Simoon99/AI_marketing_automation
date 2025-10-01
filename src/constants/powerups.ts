@@ -11,7 +11,7 @@ import {
     Globe,
     Share2,
     Brain,
-    LucideIcon
+    type LucideIcon
 } from "lucide-react";
 
 export type PowerUp = {
