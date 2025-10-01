@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { cn } from "@/lib";
-import { Bot, LayoutDashboard, MessageSquare, Sparkles, Settings, LogOut } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { Bot, MessageSquare, Sparkles, Settings, LogOut } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
 
 const navigation = [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { name: "Agents", href: "/dashboard?tab=agents", icon: Bot },
-    { name: "AI Chat", href: "/dashboard?tab=chat", icon: MessageSquare },
-    { name: "Power Ups", href: "/dashboard?tab=powerups", icon: Sparkles },
+    { name: "Agents", href: "/dashboard/agents", icon: Bot },
+    { name: "Celio", href: "/dashboard/celio", icon: MessageSquare },
+    { name: "Power Ups", href: "/dashboard/powerups", icon: Sparkles },
 ];
 
 export default function DashboardSidebar() {
