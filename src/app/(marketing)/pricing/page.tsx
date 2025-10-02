@@ -10,8 +10,6 @@ import {
 } from "lucide-react";
 import Container from "@/components/global/container";
 import { motion, AnimatePresence } from "framer-motion";
-import Navbar from "@/components/marketing/navbar";
-import Footer from "@/components/marketing/footer";
 
 type Helper = {
     id: string;
@@ -34,13 +32,18 @@ const HELPERS: Helper[] = [
         description: 'Content strategy, campaigns, and brand positioning',
         color: 'from-blue-500 to-cyan-500',
         icon: TrendingUp,
-        price: 12.99,
+        price: 39,
         benefits: [
-            'AI-powered content strategy',
+            'AI-powered content strategy & planning',
             'Campaign planning and execution',
-            'Brand positioning analysis',
-            'Competitor research',
-            'Marketing automation setup',
+            'Brand positioning and messaging',
+            'Competitor analysis and insights',
+            'Marketing automation workflows',
+            'Content calendar management',
+            'Social media strategy',
+            'Influencer outreach templates',
+            'Marketing metrics dashboard',
+            'ROI tracking and reporting',
         ],
     },
     {
@@ -51,13 +54,18 @@ const HELPERS: Helper[] = [
         description: 'Lead generation, outreach, and closing deals',
         color: 'from-green-500 to-emerald-500',
         icon: Briefcase,
-        price: 12.99,
+        price: 39,
         benefits: [
-            'Lead generation strategies',
+            'Lead generation and qualification',
             'Outreach message templates',
             'Sales funnel optimization',
             'Objection handling scripts',
             'Deal closing techniques',
+            'CRM integration and management',
+            'Follow-up automation',
+            'Sales pitch refinement',
+            'Proposal templates',
+            'Commission calculators',
         ],
     },
     {
@@ -68,13 +76,18 @@ const HELPERS: Helper[] = [
         description: 'Budgeting, forecasting, and financial planning',
         color: 'from-amber-500 to-yellow-500',
         icon: DollarSign,
-        price: 12.99,
+        price: 39,
         benefits: [
             'Budget planning and tracking',
-            'Financial forecasting',
-            'Cash flow analysis',
+            'Financial forecasting models',
+            'Cash flow analysis and projections',
             'Investment recommendations',
             'Cost optimization strategies',
+            'Profit margin analysis',
+            'Tax planning assistance',
+            'Invoice and payment tracking',
+            'Financial reporting automation',
+            'Expense categorization',
         ],
     },
     {
@@ -85,13 +98,18 @@ const HELPERS: Helper[] = [
         description: 'Process optimization and workflow automation',
         color: 'from-purple-500 to-violet-500',
         icon: BarChart,
-        price: 12.99,
+        price: 39,
         benefits: [
-            'Process optimization',
-            'Workflow automation',
-            'Resource allocation',
+            'Process optimization and mapping',
+            'Workflow automation setup',
+            'Resource allocation planning',
             'Efficiency improvements',
-            'Operations analytics',
+            'Operations analytics dashboard',
+            'SOP documentation',
+            'Team task delegation',
+            'Performance monitoring',
+            'Bottleneck identification',
+            'Scalability planning',
         ],
     },
     {
@@ -102,13 +120,18 @@ const HELPERS: Helper[] = [
         description: 'Customer support, onboarding, and retention',
         color: 'from-pink-500 to-rose-500',
         icon: Users,
-        price: 12.99,
+        price: 39,
         benefits: [
             'Customer support automation',
-            'Onboarding workflows',
-            'Retention strategies',
-            'Satisfaction surveys',
+            'Onboarding workflow creation',
+            'Retention strategies and campaigns',
+            'Satisfaction surveys and NPS',
             'Support ticket management',
+            'FAQ and knowledge base',
+            'Live chat integration',
+            'Customer feedback analysis',
+            'Churn prevention strategies',
+            'Success milestone tracking',
         ],
     },
     {
@@ -119,13 +142,18 @@ const HELPERS: Helper[] = [
         description: 'Email campaigns, automation, and optimization',
         color: 'from-indigo-500 to-blue-500',
         icon: Mail,
-        price: 12.99,
+        price: 39,
         benefits: [
             'Email campaign creation',
             'Automation sequences',
             'A/B testing strategies',
             'Deliverability optimization',
             'Performance analytics',
+            'List segmentation',
+            'Template design',
+            'Subject line optimization',
+            'Re-engagement campaigns',
+            'Email warmup strategies',
         ],
     },
     {
@@ -136,13 +164,18 @@ const HELPERS: Helper[] = [
         description: 'Integrations, APIs, and technical solutions',
         color: 'from-slate-500 to-gray-600',
         icon: Code,
-        price: 12.99,
+        price: 39,
         benefits: [
             'Integration recommendations',
             'API implementation guidance',
             'Technical troubleshooting',
             'System architecture advice',
             'Development best practices',
+            'Webhook configuration',
+            'Database optimization',
+            'Security recommendations',
+            'Code review assistance',
+            'Documentation generation',
         ],
     },
     {
@@ -153,13 +186,18 @@ const HELPERS: Helper[] = [
         description: 'Data analysis, insights, and reporting',
         color: 'from-teal-500 to-cyan-500',
         icon: BarChart,
-        price: 12.99,
+        price: 39,
         benefits: [
             'Data analysis and insights',
             'Custom report generation',
             'KPI tracking and monitoring',
-            'Predictive analytics',
-            'Dashboard creation',
+            'Predictive analytics models',
+            'Interactive dashboard creation',
+            'Data visualization',
+            'Trend identification',
+            'Performance benchmarking',
+            'Statistical analysis',
+            'Real-time data monitoring',
         ],
     },
     {
@@ -170,13 +208,18 @@ const HELPERS: Helper[] = [
         description: 'Online sales, product optimization, and conversions',
         color: 'from-orange-500 to-red-500',
         icon: ShoppingCart,
-        price: 12.99,
+        price: 39,
         benefits: [
-            'Product optimization',
+            'Product page optimization',
             'Conversion rate improvement',
-            'Shopping cart optimization',
-            'Pricing strategies',
+            'Shopping cart abandonment recovery',
+            'Dynamic pricing strategies',
             'Inventory management',
+            'Product description generation',
+            'Upsell and cross-sell tactics',
+            'Customer lifetime value analysis',
+            'Checkout flow optimization',
+            'Reviews and ratings management',
         ],
     },
     {
@@ -187,13 +230,18 @@ const HELPERS: Helper[] = [
         description: 'Blog posts, articles, and creative writing',
         color: 'from-fuchsia-500 to-pink-500',
         icon: PenTool,
-        price: 12.99,
+        price: 39,
         benefits: [
-            'Blog post creation',
-            'Article writing',
-            'SEO optimization',
+            'Blog post creation (1000+ words)',
+            'Article writing and research',
+            'SEO content optimization',
             'Content calendar planning',
-            'Copywriting for ads',
+            'Copywriting for ads and emails',
+            'Meta descriptions and titles',
+            'Social media captions',
+            'Video scripts',
+            'Case studies and whitepapers',
+            'Content repurposing',
         ],
     },
     {
@@ -204,13 +252,18 @@ const HELPERS: Helper[] = [
         description: 'Social strategy, engagement, and community',
         color: 'from-cyan-500 to-blue-500',
         icon: MessageSquare,
-        price: 12.99,
+        price: 39,
         benefits: [
-            'Social media strategy',
-            'Content scheduling',
+            'Multi-platform social strategy',
+            'Content scheduling automation',
             'Engagement optimization',
             'Community management',
-            'Social analytics',
+            'Social media analytics',
+            'Hashtag research and optimization',
+            'Influencer collaboration planning',
+            'Contest and giveaway management',
+            'Social listening and monitoring',
+            'Trend spotting and adaptation',
         ],
     },
     {
@@ -221,13 +274,18 @@ const HELPERS: Helper[] = [
         description: 'Business planning, growth, and innovation',
         color: 'from-violet-500 to-purple-500',
         icon: Lightbulb,
-        price: 12.99,
+        price: 39,
         benefits: [
-            'Business planning',
-            'Growth strategies',
-            'Market analysis',
+            'Business model development',
+            'Growth strategies and planning',
+            'Market analysis and research',
             'Innovation consulting',
             'Strategic roadmapping',
+            'Competitive positioning',
+            'Go-to-market strategy',
+            'Partnership opportunities',
+            'Scaling frameworks',
+            'Risk assessment and mitigation',
         ],
     },
 ];
@@ -235,12 +293,20 @@ const HELPERS: Helper[] = [
 const BUNDLE_BENEFITS = [
     'Access to all 12+ AI Helpers',
     'Unlimited usage across all tools',
-    'Priority customer support',
-    'Early access to new features',
-    'Advanced analytics dashboard',
-    'Custom integrations',
-    'Dedicated account manager',
-    'Team collaboration features',
+    'Priority 24/7 customer support',
+    'Early access to new features and updates',
+    'Advanced analytics and insights dashboard',
+    'Custom integrations with your existing tools',
+    'Dedicated account manager (Enterprise)',
+    'Team collaboration and workspace features',
+    'White-label options available',
+    'API access for custom workflows',
+    'Training and onboarding sessions',
+    'Monthly strategy consultation calls',
+    'Advanced automation capabilities',
+    'Custom AI model training',
+    'Priority feature requests',
+    'SLA guarantees and uptime monitoring',
 ];
 
 const MAIN_FEATURES = [
@@ -523,11 +589,7 @@ export default function PricingPage() {
     };
 
     return (
-        <>
-            {/* Custom non-sticky navbar for pricing page */}
-            <Navbar sticky={false} />
-            
-            <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
+        <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
                 {/* Countdown Timer Banner - Always visible at top */}
                 <div className="sticky top-0 z-40 bg-gradient-to-r from-green-600 to-green-500 text-white py-2.5">
                 <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-3">
@@ -718,15 +780,15 @@ export default function PricingPage() {
                                         <div className="relative flex items-center justify-between">
                                             {/* Left Side - Content */}
                                             <div className="flex-1 text-white">
-                                                <h2 className="text-4xl font-bold mb-3">
-                                                    Celio X
-                                                </h2>
-                                                <p className="text-2xl font-semibold mb-4">
-                                                    $38.80/month
-                                                </p>
-                                                <p className="text-lg text-white/95">
-                                                    All 12+ AI Helpers
-                                                </p>
+                                            <h2 className="text-4xl font-bold mb-3">
+                                                Celio X
+                                            </h2>
+                                            <p className="text-2xl font-semibold mb-4">
+                                                $97/month
+                                            </p>
+                                            <p className="text-lg text-white/95">
+                                                All 12+ AI Helpers
+                                            </p>
                                             </div>
 
                                             {/* Right Side - Helper Avatars */}
@@ -961,10 +1023,6 @@ export default function PricingPage() {
                     </>
                 )}
             </AnimatePresence>
-            </div>
-            
-            {/* Footer */}
-            <Footer />
-        </>
+        </div>
     );
 }
