@@ -479,7 +479,7 @@ export default function AgentsTab() {
                     <div className="max-w-6xl mx-auto flex justify-between items-center">
                         {/* View Tabs */}
                         <div className="flex gap-2">
-                            <Button
+                            <Button 
                                 variant={viewMode === 'new-agent' ? 'default' : 'ghost'}
                                 onClick={() => setViewMode('new-agent')}
                                 className="gap-2"
@@ -487,7 +487,7 @@ export default function AgentsTab() {
                                 <Plus className="w-4 h-4" />
                                 New Agent
                             </Button>
-                            <Button
+                            <Button 
                                 variant={viewMode === 'my-agents' ? 'default' : 'ghost'}
                                 onClick={() => setViewMode('my-agents')}
                                 className="gap-2"
@@ -500,7 +500,7 @@ export default function AgentsTab() {
                                     </span>
                                 )}
                             </Button>
-                        </div>
+                    </div>
 
                         {/* Integrations Button */}
                         <Button
@@ -562,8 +562,8 @@ export default function AgentsTab() {
                                             <ArrowUp className="w-4 h-4" />
                                         )}
                                     </Button>
-                                </div>
-                            </div>
+                </div>
+            </div>
 
                             <p className="text-xs text-muted-foreground mt-3">
                                 Press <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs">Ctrl</kbd> + <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs">Enter</kbd> to create
@@ -575,11 +575,11 @@ export default function AgentsTab() {
                     <div className="flex-1 px-6 pb-8">
                         <div className="max-w-6xl mx-auto space-y-8">
                             {/* Agent Templates */}
-                            <div>
+                    <div>
                                 <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                                     <Sparkles className="w-5 h-5 text-yellow-500" />
                                     Agent Templates (20+)
-                                </h2>
+                        </h2>
                                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     {agentTemplates.map((template) => (
                                         <button
