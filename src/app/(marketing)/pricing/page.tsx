@@ -19,6 +19,7 @@ type Helper = {
     color: string;
     icon: any;
     price: number;
+    benefits: string[];
 };
 
 const HELPERS: Helper[] = [
@@ -31,6 +32,13 @@ const HELPERS: Helper[] = [
         color: 'from-blue-500 to-cyan-500',
         icon: TrendingUp,
         price: 12.99,
+        benefits: [
+            'AI-powered content strategy',
+            'Campaign planning and execution',
+            'Brand positioning analysis',
+            'Competitor research',
+            'Marketing automation setup',
+        ],
     },
     {
         id: 'sales',
@@ -41,6 +49,13 @@ const HELPERS: Helper[] = [
         color: 'from-green-500 to-emerald-500',
         icon: Briefcase,
         price: 12.99,
+        benefits: [
+            'Lead generation strategies',
+            'Outreach message templates',
+            'Sales funnel optimization',
+            'Objection handling scripts',
+            'Deal closing techniques',
+        ],
     },
     {
         id: 'finance',
@@ -51,6 +66,13 @@ const HELPERS: Helper[] = [
         color: 'from-amber-500 to-yellow-500',
         icon: DollarSign,
         price: 12.99,
+        benefits: [
+            'Budget planning and tracking',
+            'Financial forecasting',
+            'Cash flow analysis',
+            'Investment recommendations',
+            'Cost optimization strategies',
+        ],
     },
     {
         id: 'operations',
@@ -61,6 +83,13 @@ const HELPERS: Helper[] = [
         color: 'from-purple-500 to-violet-500',
         icon: BarChart,
         price: 12.99,
+        benefits: [
+            'Process optimization',
+            'Workflow automation',
+            'Resource allocation',
+            'Efficiency improvements',
+            'Operations analytics',
+        ],
     },
     {
         id: 'customer',
@@ -71,6 +100,13 @@ const HELPERS: Helper[] = [
         color: 'from-pink-500 to-rose-500',
         icon: Users,
         price: 12.99,
+        benefits: [
+            'Customer support automation',
+            'Onboarding workflows',
+            'Retention strategies',
+            'Satisfaction surveys',
+            'Support ticket management',
+        ],
     },
     {
         id: 'email',
@@ -81,6 +117,13 @@ const HELPERS: Helper[] = [
         color: 'from-indigo-500 to-blue-500',
         icon: Mail,
         price: 12.99,
+        benefits: [
+            'Email campaign creation',
+            'Automation sequences',
+            'A/B testing strategies',
+            'Deliverability optimization',
+            'Performance analytics',
+        ],
     },
     {
         id: 'tech',
@@ -91,6 +134,13 @@ const HELPERS: Helper[] = [
         color: 'from-slate-500 to-gray-600',
         icon: Code,
         price: 12.99,
+        benefits: [
+            'Integration recommendations',
+            'API implementation guidance',
+            'Technical troubleshooting',
+            'System architecture advice',
+            'Development best practices',
+        ],
     },
     {
         id: 'analytics',
@@ -101,6 +151,13 @@ const HELPERS: Helper[] = [
         color: 'from-teal-500 to-cyan-500',
         icon: BarChart,
         price: 12.99,
+        benefits: [
+            'Data analysis and insights',
+            'Custom report generation',
+            'KPI tracking and monitoring',
+            'Predictive analytics',
+            'Dashboard creation',
+        ],
     },
     {
         id: 'ecommerce',
@@ -111,6 +168,13 @@ const HELPERS: Helper[] = [
         color: 'from-orange-500 to-red-500',
         icon: ShoppingCart,
         price: 12.99,
+        benefits: [
+            'Product optimization',
+            'Conversion rate improvement',
+            'Shopping cart optimization',
+            'Pricing strategies',
+            'Inventory management',
+        ],
     },
     {
         id: 'content',
@@ -121,6 +185,13 @@ const HELPERS: Helper[] = [
         color: 'from-fuchsia-500 to-pink-500',
         icon: PenTool,
         price: 12.99,
+        benefits: [
+            'Blog post creation',
+            'Article writing',
+            'SEO optimization',
+            'Content calendar planning',
+            'Copywriting for ads',
+        ],
     },
     {
         id: 'social',
@@ -131,6 +202,13 @@ const HELPERS: Helper[] = [
         color: 'from-cyan-500 to-blue-500',
         icon: MessageSquare,
         price: 12.99,
+        benefits: [
+            'Social media strategy',
+            'Content scheduling',
+            'Engagement optimization',
+            'Community management',
+            'Social analytics',
+        ],
     },
     {
         id: 'strategy',
@@ -141,7 +219,25 @@ const HELPERS: Helper[] = [
         color: 'from-violet-500 to-purple-500',
         icon: Lightbulb,
         price: 12.99,
+        benefits: [
+            'Business planning',
+            'Growth strategies',
+            'Market analysis',
+            'Innovation consulting',
+            'Strategic roadmapping',
+        ],
     },
+];
+
+const BUNDLE_BENEFITS = [
+    'Access to all 12+ AI Helpers',
+    'Unlimited usage across all tools',
+    'Priority customer support',
+    'Early access to new features',
+    'Advanced analytics dashboard',
+    'Custom integrations',
+    'Dedicated account manager',
+    'Team collaboration features',
 ];
 
 type PricingTier = {
@@ -183,159 +279,246 @@ const PRICING_TIERS: PricingTier[] = [
 ];
 
 export default function PricingPage() {
+    const [viewMode, setViewMode] = useState<'individual' | 'bundle'>('individual');
     const [selectedHelper, setSelectedHelper] = useState<Helper | null>(null);
-    const [showBundleModal, setShowBundleModal] = useState(false);
+    const [showPricingModal, setShowPricingModal] = useState(false);
     const [selectedPricingTier, setSelectedPricingTier] = useState<string>('monthly');
 
     const handleHelperClick = (helper: Helper) => {
         setSelectedHelper(helper);
     };
 
-    const handleBundleClick = () => {
-        setShowBundleModal(true);
+    const handleRedeemClick = () => {
+        setShowPricingModal(true);
     };
 
     const closePricingModal = () => {
-        setShowBundleModal(false);
-        setSelectedHelper(null);
+        setShowPricingModal(false);
     };
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20 py-20">
             <Container>
                 <div className="max-w-7xl mx-auto px-4">
-                    {/* Header */}
-                    <div className="text-center mb-16">
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-                            Choose Your <span className="bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">AI Helper</span>
-                        </h1>
-                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                            Select individual AI helpers or get the complete bundle with all 12+ specialists
-                        </p>
-                    </div>
-
                     {/* Helper Selection Tabs */}
                     <div className="flex justify-center mb-12">
                         <div className="inline-flex rounded-lg bg-muted/50 p-1.5 backdrop-blur-sm border border-border">
-                            <button className="px-6 py-2.5 rounded-md bg-background shadow-md font-medium transition-all">
+                            <button 
+                                onClick={() => {
+                                    setViewMode('individual');
+                                    setSelectedHelper(null);
+                                }}
+                                className={cn(
+                                    "px-6 py-2.5 rounded-md font-medium transition-all",
+                                    viewMode === 'individual' 
+                                        ? "bg-background shadow-md" 
+                                        : "hover:bg-background/50"
+                                )}
+                            >
                                 Individual
                             </button>
                             <button 
-                                onClick={handleBundleClick}
-                                className="px-6 py-2.5 rounded-md font-medium transition-all hover:bg-background/50"
+                                onClick={() => {
+                                    setViewMode('bundle');
+                                    setSelectedHelper(null);
+                                }}
+                                className={cn(
+                                    "px-6 py-2.5 rounded-md font-medium transition-all",
+                                    viewMode === 'bundle' 
+                                        ? "bg-background shadow-md" 
+                                        : "hover:bg-background/50"
+                                )}
                             >
-                                All Helpers Bundle
+                                Celio X
                             </button>
                         </div>
                     </div>
 
-                    {/* Individual Helpers Grid */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-12">
-                        {HELPERS.map((helper, index) => (
-                            <motion.button
-                                key={helper.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: index * 0.05 }}
-                                onClick={() => handleHelperClick(helper)}
-                                className={cn(
-                                    "group relative flex flex-col items-center p-6 rounded-2xl border-2 transition-all duration-300",
-                                    "hover:scale-105 hover:shadow-xl cursor-pointer",
-                                    selectedHelper?.id === helper.id
-                                        ? "border-primary bg-primary/5 shadow-lg"
-                                        : "border-border bg-card hover:border-primary/50"
-                                )}
-                            >
-                                {/* Helper Avatar */}
-                                <div className={cn(
-                                    "w-16 h-16 rounded-full mb-3 flex items-center justify-center text-3xl transition-all",
-                                    "bg-gradient-to-br shadow-lg group-hover:scale-110",
-                                    helper.color
-                                )}>
-                                    {helper.emoji}
-                                </div>
+                    {/* Individual View */}
+                    {viewMode === 'individual' && (
+                        <>
+                            {/* Individual Helpers Row */}
+                            <div className="flex items-center justify-center gap-3 md:gap-6 mb-12 flex-wrap max-w-6xl mx-auto">
+                                {HELPERS.map((helper, index) => (
+                                    <motion.button
+                                        key={helper.id}
+                                        initial={{ opacity: 0, scale: 0.8 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        transition={{ delay: index * 0.05 }}
+                                        onClick={() => handleHelperClick(helper)}
+                                        className={cn(
+                                            "group relative flex flex-col items-center transition-all duration-300",
+                                            "cursor-pointer"
+                                        )}
+                                    >
+                                        {/* Helper Avatar */}
+                                        <div className={cn(
+                                            "w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-3xl md:text-4xl transition-all",
+                                            "bg-gradient-to-br shadow-lg hover:scale-110",
+                                            helper.color,
+                                            selectedHelper?.id === helper.id && "ring-4 ring-primary ring-offset-2 ring-offset-background scale-110"
+                                        )}>
+                                            {helper.emoji}
+                                        </div>
 
-                                {/* Helper Name */}
-                                <h3 className="font-semibold text-sm text-center mb-1 line-clamp-2">
-                                    {helper.name}
-                                </h3>
-
-                                {/* Price */}
-                                <div className="text-xs text-muted-foreground mb-2">
-                                    ${helper.price}<span className="text-[10px]">/mo</span>
-                                </div>
-
-                                {/* Hover Effect */}
-                                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/0 to-primary/0 group-hover:from-primary/5 group-hover:to-transparent transition-all" />
-                            </motion.button>
-                        ))}
-                    </div>
-
-                    {/* Bundle Card */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="max-w-4xl mx-auto"
-                    >
-                        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 p-8 md:p-12 shadow-2xl">
-                            {/* Background Pattern */}
-                            <div className="absolute inset-0 opacity-10">
-                                <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.05)_25%,rgba(255,255,255,.05)_50%,transparent_50%,transparent_75%,rgba(255,255,255,.05)_75%,rgba(255,255,255,.05))] bg-[length:60px_60px]" />
+                                        {/* Helper Name */}
+                                        <h3 className="font-medium text-xs md:text-sm text-center mt-2 line-clamp-2 max-w-[80px]">
+                                            {helper.name}
+                                        </h3>
+                                    </motion.button>
+                                ))}
                             </div>
 
-                            <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
-                                {/* Left Side - Content */}
-                                <div className="flex-1 text-white">
-                                    <h2 className="text-3xl md:text-4xl font-bold mb-3">
-                                        Complete Bundle
-                                    </h2>
-                                    <p className="text-xl md:text-2xl font-semibold mb-4 text-white/90">
-                                        <span className="line-through text-white/60">$97</span> $38.80/month
-                                    </p>
-                                    <p className="text-lg text-white/90 mb-6">
-                                        All 12+ AI Helpers
-                                    </p>
+                            {/* Selected Helper Details */}
+                            {selectedHelper && (
+                                <motion.div
+                                    initial={{ opacity: 0, y: 30 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ type: "spring", damping: 25 }}
+                                    className="max-w-4xl mx-auto"
+                                >
+                                    <div className={cn(
+                                        "relative overflow-hidden rounded-3xl p-8 md:p-12 shadow-2xl",
+                                        "bg-gradient-to-br",
+                                        selectedHelper.color
+                                    )}>
+                                        {/* Background Pattern */}
+                                        <div className="absolute inset-0 opacity-10">
+                                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.1)_25%,rgba(255,255,255,.1)_50%,transparent_50%,transparent_75%,rgba(255,255,255,.1)_75%,rgba(255,255,255,.1))] bg-[length:60px_60px]" />
+                                        </div>
+
+                                        <div className="relative">
+                                            {/* Header */}
+                                            <div className="flex items-center gap-4 mb-6">
+                                                <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-5xl">
+                                                    {selectedHelper.emoji}
+                                                </div>
+                                                <div className="flex-1 text-white">
+                                                    <h2 className="text-3xl md:text-4xl font-bold mb-1">
+                                                        {selectedHelper.name}
+                                                    </h2>
+                                                    <p className="text-lg text-white/90">
+                                                        {selectedHelper.description}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            {/* Benefits */}
+                                            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
+                                                <h3 className="text-xl font-semibold text-white mb-4">What's included:</h3>
+                                                <ul className="space-y-3">
+                                                    {selectedHelper.benefits.map((benefit, index) => (
+                                                        <li key={index} className="flex items-start gap-3 text-white/90">
+                                                            <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                                                            <span>{benefit}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+
+                                            {/* CTA Button */}
+                                            <Button 
+                                                size="lg"
+                                                onClick={handleRedeemClick}
+                                                className="w-full bg-white text-gray-900 hover:bg-gray-100 font-bold text-xl px-8 py-7 rounded-xl shadow-xl hover:shadow-2xl transition-all hover:scale-105"
+                                            >
+                                                Redeem 60% OFF
+                                            </Button>
+                                            <p className="text-sm text-center text-white/70 mt-4">
+                                                14-day money back guarantee
+                                            </p>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </>
+                    )}
+
+                    {/* Bundle View */}
+                    {viewMode === 'bundle' && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ type: "spring", damping: 25 }}
+                            className="max-w-4xl mx-auto"
+                        >
+                            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 p-8 md:p-12 shadow-2xl">
+                                {/* Background Pattern */}
+                                <div className="absolute inset-0 opacity-10">
+                                    <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.05)_25%,rgba(255,255,255,.05)_50%,transparent_50%,transparent_75%,rgba(255,255,255,.05)_75%,rgba(255,255,255,.05))] bg-[length:60px_60px]" />
+                                </div>
+
+                                <div className="relative">
+                                    {/* Header */}
+                                    <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-8">
+                                        {/* Left Side - Content */}
+                                        <div className="flex-1 text-white">
+                                            <h2 className="text-3xl md:text-4xl font-bold mb-3">
+                                                Celio X
+                                            </h2>
+                                            <p className="text-xl md:text-2xl font-semibold mb-4 text-white/90">
+                                                <span className="line-through text-white/60">$97</span> $38.80/month
+                                            </p>
+                                            <p className="text-lg text-white/90">
+                                                All 12+ AI Helpers
+                                            </p>
+                                        </div>
+
+                                        {/* Right Side - Helper Avatars */}
+                                        <div className="flex-shrink-0">
+                                            <div className="grid grid-cols-4 gap-2">
+                                                {HELPERS.slice(0, 8).map((helper, index) => (
+                                                    <div
+                                                        key={helper.id}
+                                                        className={cn(
+                                                            "w-14 h-14 rounded-full flex items-center justify-center text-2xl",
+                                                            "bg-gradient-to-br shadow-lg transition-all hover:scale-110",
+                                                            helper.color,
+                                                            "animate-pulse"
+                                                        )}
+                                                        style={{ animationDelay: `${index * 0.1}s` }}
+                                                    >
+                                                        {helper.emoji}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Benefits */}
+                                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-6">
+                                        <h3 className="text-xl font-semibold text-white mb-4">What's included:</h3>
+                                        <ul className="grid md:grid-cols-2 gap-3">
+                                            {BUNDLE_BENEFITS.map((benefit, index) => (
+                                                <li key={index} className="flex items-start gap-3 text-white/90">
+                                                    <Check className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                                                    <span>{benefit}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    {/* CTA Button */}
                                     <Button 
                                         size="lg"
-                                        onClick={handleBundleClick}
-                                        className="bg-white text-purple-700 hover:bg-gray-100 font-bold text-lg px-8 py-6 rounded-xl shadow-xl hover:shadow-2xl transition-all hover:scale-105"
+                                        onClick={handleRedeemClick}
+                                        className="w-full bg-white text-purple-700 hover:bg-gray-100 font-bold text-xl px-8 py-7 rounded-xl shadow-xl hover:shadow-2xl transition-all hover:scale-105"
                                     >
-                                        Get 60% OFF
+                                        Redeem 60% OFF
                                     </Button>
-                                    <p className="text-sm text-white/70 mt-4">
+                                    <p className="text-sm text-center text-white/70 mt-4">
                                         14-day money back guarantee
                                     </p>
                                 </div>
-
-                                {/* Right Side - Helper Avatars */}
-                                <div className="flex-shrink-0">
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {HELPERS.slice(0, 8).map((helper, index) => (
-                                            <div
-                                                key={helper.id}
-                                                className={cn(
-                                                    "w-14 h-14 rounded-full flex items-center justify-center text-2xl",
-                                                    "bg-gradient-to-br shadow-lg transition-all hover:scale-110",
-                                                    helper.color,
-                                                    "animate-pulse"
-                                                )}
-                                                style={{ animationDelay: `${index * 0.1}s` }}
-                                            >
-                                                {helper.emoji}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
                             </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    )}
                 </div>
             </Container>
 
             {/* Pricing Modal - Slides up from bottom */}
             <AnimatePresence>
-                {(showBundleModal || selectedHelper) && (
+                {showPricingModal && (
                     <>
                         {/* Backdrop */}
                         <motion.div
@@ -358,7 +541,7 @@ export default function PricingPage() {
                                 {/* Header */}
                                 <div className="sticky top-0 bg-background/95 backdrop-blur-sm border-b border-border px-6 py-4 rounded-t-3xl flex items-center justify-between z-10">
                                     <h2 className="text-2xl font-bold">
-                                        {selectedHelper ? selectedHelper.name : "Pricing Options"}
+                                        Pricing Options
                                     </h2>
                                     <button
                                         onClick={closePricingModal}
@@ -370,19 +553,6 @@ export default function PricingPage() {
 
                                 {/* Content */}
                                 <div className="px-6 py-8 max-w-2xl mx-auto">
-                                    {selectedHelper && (
-                                        <div className="mb-6 text-center">
-                                            <div className={cn(
-                                                "w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl",
-                                                "bg-gradient-to-br shadow-lg",
-                                                selectedHelper.color
-                                            )}>
-                                                {selectedHelper.emoji}
-                                            </div>
-                                            <p className="text-muted-foreground">{selectedHelper.description}</p>
-                                        </div>
-                                    )}
-
                                     {/* Pricing Tiers */}
                                     <div className="space-y-4">
                                         {PRICING_TIERS.map((tier) => (
@@ -430,7 +600,7 @@ export default function PricingPage() {
                                         size="lg"
                                         className="w-full mt-8 text-lg py-6 rounded-xl font-bold shadow-xl hover:shadow-2xl transition-all"
                                     >
-                                        Get {selectedHelper ? selectedHelper.name : "All Helpers"} for ${PRICING_TIERS.find(t => t.id === selectedPricingTier)?.discountedPrice}/m
+                                        Get {selectedHelper ? selectedHelper.name : "Celio X"} for ${PRICING_TIERS.find(t => t.id === selectedPricingTier)?.discountedPrice}/m
                                     </Button>
 
                                     <p className="text-center text-sm text-muted-foreground mt-4">
