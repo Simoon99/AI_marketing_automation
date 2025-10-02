@@ -51,7 +51,7 @@ const Hero = () => {
                                 <span className="px-2 py-[0.5px] h-[18px] tracking-wide flex items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-blue-600 text-[9px] font-medium mr-2 text-white">
                                     NEW
                                 </span>
-                                Explore the 2024 recap
+                                Powered by Claude 4.5 Sonnet
                             </span>
                         </button>
                     </Container>
