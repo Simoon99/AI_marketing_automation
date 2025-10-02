@@ -6,10 +6,12 @@ import { Button } from "@/components/ui/button";
 import { 
     TrendingUp, Briefcase, DollarSign, BarChart, Users, Mail, 
     Code, ShoppingCart, PenTool, MessageSquare, Lightbulb, X, Check,
-    Zap, Globe, Brain, Shield, Clock, ChevronLeft, ChevronRight, Star
+    Zap, Globe, Brain, Shield, Clock, ChevronLeft, ChevronRight, Star, Bot
 } from "lucide-react";
 import Container from "@/components/global/container";
 import { motion, AnimatePresence } from "framer-motion";
+import Navbar from "@/components/marketing/navbar";
+import Footer from "@/components/marketing/footer";
 
 type Helper = {
     id: string;
@@ -322,6 +324,140 @@ const INDIVIDUAL_PRICING_TIERS: PricingTier[] = [
     },
 ];
 
+// Helper functions to link Power-Ups and Agents to Helpers
+function getHelperPowerUps(helperId: string) {
+    const powerUpMapping: Record<string, Array<{name: string, emoji: string}>> = {
+        'marketing': [
+            { name: 'AI Static Ad Creator', emoji: '🎨' },
+            { name: 'SEO/GEO Optimizer Pro', emoji: '🔍' },
+            { name: 'Social Media Manager', emoji: '📱' },
+            { name: 'Landing Page Builder', emoji: '🌐' },
+        ],
+        'sales': [
+            { name: 'Sales Funnel Builder', emoji: '⚡' },
+            { name: 'Lead Magnet Generator', emoji: '🧲' },
+            { name: 'Email Campaign Automation', emoji: '📧' },
+        ],
+        'finance': [
+            { name: 'Invoice Generator Pro', emoji: '💰' },
+            { name: 'Financial Report Builder', emoji: '📊' },
+            { name: 'Payment Tracking System', emoji: '💳' },
+        ],
+        'analytics': [
+            { name: 'Analytics Dashboard Builder', emoji: '📈' },
+            { name: 'A/B Testing Suite', emoji: '🔬' },
+            { name: 'Conversion Optimizer', emoji: '🎯' },
+        ],
+        'operations': [
+            { name: 'Workflow Automation Builder', emoji: '⚙️' },
+            { name: 'Task Management System', emoji: '✅' },
+            { name: 'Team Collaboration Hub', emoji: '👥' },
+        ],
+        'content': [
+            { name: 'Content Calendar Generator', emoji: '📅' },
+            { name: 'Blog Post Writer AI', emoji: '✍️' },
+            { name: 'Video Script Generator', emoji: '🎬' },
+        ],
+        'support': [
+            { name: 'AI Support Chatbot', emoji: '💬' },
+            { name: 'Ticket Management System', emoji: '🎫' },
+            { name: 'Knowledge Base Builder', emoji: '📚' },
+        ],
+        'ecommerce': [
+            { name: 'Product Description Generator', emoji: '🛍️' },
+            { name: 'Inventory Management', emoji: '📦' },
+            { name: 'Order Fulfillment Automation', emoji: '🚚' },
+        ],
+        'design': [
+            { name: 'Brand Style Guide Generator', emoji: '🎨' },
+            { name: 'Logo Variation Creator', emoji: '✨' },
+            { name: 'Marketing Asset Generator', emoji: '🖼️' },
+        ],
+        'copywriting': [
+            { name: 'Ad Copy Generator', emoji: '📝' },
+            { name: 'Email Template Library', emoji: '✉️' },
+            { name: 'Sales Page Writer', emoji: '📄' },
+        ],
+        'data': [
+            { name: 'Data Visualization Tool', emoji: '📊' },
+            { name: 'Report Generator Pro', emoji: '📈' },
+            { name: 'Insights Dashboard', emoji: '💡' },
+        ],
+        'strategy': [
+            { name: 'Business Plan Generator', emoji: '📋' },
+            { name: 'Competitive Analysis Tool', emoji: '🔍' },
+            { name: 'Growth Strategy Builder', emoji: '🚀' },
+        ],
+    };
+    return powerUpMapping[helperId] || [];
+}
+
+function getHelperAgents(helperId: string) {
+    const agentMapping: Record<string, Array<{name: string, emoji: string}>> = {
+        'marketing': [
+            { name: 'Social Media Monitor', emoji: '📱' },
+            { name: 'Content Repurposer', emoji: '♻️' },
+            { name: 'SEO Content Optimizer', emoji: '🔍' },
+        ],
+        'sales': [
+            { name: 'Lead Qualifier', emoji: '🎯' },
+            { name: 'Sales Email Sequencer', emoji: '📧' },
+            { name: 'Meeting Scheduler', emoji: '📅' },
+        ],
+        'finance': [
+            { name: 'Invoice Generator', emoji: '💰' },
+            { name: 'Payment Tracker', emoji: '💳' },
+            { name: 'Expense Analyzer', emoji: '📊' },
+        ],
+        'analytics': [
+            { name: 'Data Report Generator', emoji: '📈' },
+            { name: 'Metrics Dashboard', emoji: '📊' },
+            { name: 'Competitor Tracker', emoji: '🔬' },
+        ],
+        'operations': [
+            { name: 'Task Automation', emoji: '⚙️' },
+            { name: 'Workflow Manager', emoji: '🔄' },
+            { name: 'Project Coordinator', emoji: '📋' },
+        ],
+        'content': [
+            { name: 'Blog Post Scheduler', emoji: '📅' },
+            { name: 'Content Calendar', emoji: '🗓️' },
+            { name: 'Newsletter Generator', emoji: '📰' },
+        ],
+        'support': [
+            { name: 'Customer Support Assistant', emoji: '💬' },
+            { name: 'Ticket Prioritizer', emoji: '🎫' },
+            { name: 'FAQ Updater', emoji: '❓' },
+        ],
+        'ecommerce': [
+            { name: 'Product Onboarding', emoji: '🛍️' },
+            { name: 'Order Tracker', emoji: '📦' },
+            { name: 'Inventory Alert', emoji: '⚠️' },
+        ],
+        'design': [
+            { name: 'Asset Organizer', emoji: '🎨' },
+            { name: 'Brand Consistency Checker', emoji: '✅' },
+            { name: 'Design Template Generator', emoji: '🖼️' },
+        ],
+        'copywriting': [
+            { name: 'Copy Variations Generator', emoji: '📝' },
+            { name: 'Tone Consistency Checker', emoji: '🎭' },
+            { name: 'A/B Test Copy Creator', emoji: '🔬' },
+        ],
+        'data': [
+            { name: 'Data Analyzer', emoji: '📊' },
+            { name: 'Insight Generator', emoji: '💡' },
+            { name: 'Trend Detector', emoji: '📈' },
+        ],
+        'strategy': [
+            { name: 'Competitor Tracker', emoji: '🔍' },
+            { name: 'Market Researcher', emoji: '📊' },
+            { name: 'Growth Opportunity Finder', emoji: '🚀' },
+        ],
+    };
+    return agentMapping[helperId] || [];
+}
+
 // Countdown Timer Component
 function CountdownTimer() {
     const [timeLeft, setTimeLeft] = useState({
@@ -387,9 +523,13 @@ export default function PricingPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
-            {/* Countdown Timer Banner - Always visible at top */}
-            <div className="sticky top-0 z-40 bg-gradient-to-r from-green-600 to-green-500 text-white py-2.5">
+        <>
+            {/* Custom non-sticky navbar for pricing page */}
+            <Navbar sticky={false} />
+            
+            <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20">
+                {/* Countdown Timer Banner - Always visible at top */}
+                <div className="sticky top-0 z-40 bg-gradient-to-r from-green-600 to-green-500 text-white py-2.5">
                 <div className="max-w-7xl mx-auto px-4 flex items-center justify-center gap-3">
                     <span className="font-semibold text-base">Summer Sale: 60% OFF</span>
                     <CountdownTimer />
@@ -434,95 +574,7 @@ export default function PricingPage() {
                             </div>
                         </div>
 
-                        {/* Hero Card - Individual Helper */}
-                        {viewMode === 'individual' && selectedHelper && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="max-w-5xl mx-auto mb-8"
-                            >
-                                <div className={cn(
-                                    "relative overflow-hidden rounded-3xl p-10 shadow-xl border-2",
-                                    "bg-gradient-to-br",
-                                    selectedHelper.color
-                                )}>
-                                    <div className="relative flex items-center justify-between">
-                                        {/* Left Side - Content */}
-                                        <div className="flex-1">
-                                            <h2 className="text-4xl font-bold text-white mb-3">
-                                                {selectedHelper.name}
-                                            </h2>
-                                            <p className="text-xl text-white/90 mb-4">
-                                                ${selectedHelper.price}/month
-                                            </p>
-                                            <p className="text-lg text-white/95 mb-2">
-                                                {selectedHelper.description}
-                                            </p>
-                                        </div>
-
-                                        {/* Right Side - Large Emoji */}
-                                        <div className="flex-shrink-0 ml-8">
-                                            <div className="w-48 h-48 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-9xl">
-                                                {selectedHelper.emoji}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {/* Hero Card - Celio X Bundle */}
-                        {viewMode === 'bundle' && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="max-w-5xl mx-auto mb-8"
-                            >
-                                <div className="relative overflow-hidden rounded-3xl p-10 shadow-xl border-2 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700">
-                                    {/* Background Pattern */}
-                                    <div className="absolute inset-0 opacity-10">
-                                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.05)_25%,rgba(255,255,255,.05)_50%,transparent_50%,transparent_75%,rgba(255,255,255,.05)_75%,rgba(255,255,255,.05))] bg-[length:60px_60px]" />
-                                    </div>
-
-                                    <div className="relative flex items-center justify-between">
-                                        {/* Left Side - Content */}
-                                        <div className="flex-1 text-white">
-                                            <h2 className="text-4xl font-bold mb-3">
-                                                Celio X
-                                            </h2>
-                                            <p className="text-2xl font-semibold mb-4">
-                                                <span className="line-through text-white/60">$97</span> $38.80/month
-                                            </p>
-                                            <p className="text-lg text-white/95">
-                                                All 12+ AI Helpers
-                                            </p>
-                                        </div>
-
-                                        {/* Right Side - Helper Avatars */}
-                                        <div className="flex-shrink-0 ml-8">
-                                            <div className="grid grid-cols-4 gap-2">
-                                                {HELPERS.slice(0, 8).map((helper, index) => (
-                                                    <div
-                                                        key={helper.id}
-                                                        className={cn(
-                                                            "w-16 h-16 rounded-full flex items-center justify-center text-2xl",
-                                                            "bg-gradient-to-br shadow-lg transition-all hover:scale-110",
-                                                            helper.color,
-                                                            "animate-pulse"
-                                                        )}
-                                                        style={{ animationDelay: `${index * 0.1}s` }}
-                                                    >
-                                                        {helper.emoji}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        )}
-
-                        {/* Individual Helpers Row */}
+                        {/* Individual Helpers Row - MOVED ABOVE HERO CARD */}
                         {viewMode === 'individual' && (
                             <div className="mb-8">
                                 <div className="flex items-center justify-center gap-3 flex-wrap max-w-5xl mx-auto">
@@ -552,13 +604,52 @@ export default function PricingPage() {
                             </div>
                         )}
 
-                        {/* Individual Helper Benefits - Below avatars */}
+                        {/* Hero Card - Individual Helper - AFTER AVATARS */}
+                        {viewMode === 'individual' && selectedHelper && (
+                            <motion.div
+                                key={selectedHelper.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="max-w-5xl mx-auto mb-8"
+                            >
+                                <div className={cn(
+                                    "relative overflow-hidden rounded-3xl p-10 shadow-xl border-2",
+                                    "bg-gradient-to-br",
+                                    selectedHelper.color
+                                )}>
+                                    <div className="relative flex items-center justify-between">
+                                        {/* Left Side - Content */}
+                                        <div className="flex-1">
+                                            <h2 className="text-4xl font-bold text-white mb-3">
+                                                {selectedHelper.name}
+                                            </h2>
+                                            <p className="text-2xl font-semibold text-white/95 mb-4">
+                                                ${selectedHelper.price}/month
+                                            </p>
+                                            <p className="text-lg text-white/90">
+                                                {selectedHelper.description}
+                                            </p>
+                                        </div>
+
+                                        {/* Right Side - Large Emoji */}
+                                        <div className="flex-shrink-0 ml-8">
+                                            <div className="w-48 h-48 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-9xl">
+                                                {selectedHelper.emoji}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Individual Helper Benefits, Power-Ups & Agents - Below hero card */}
                         {viewMode === 'individual' && selectedHelper && (
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="max-w-4xl mx-auto mb-12"
+                                className="max-w-4xl mx-auto mb-12 space-y-6"
                             >
+                                {/* Core Benefits */}
                                 <div className="bg-card rounded-2xl border border-border p-6">
                                     <h3 className="text-lg font-semibold mb-4">What's included:</h3>
                                     <ul className="grid md:grid-cols-2 gap-3">
@@ -570,12 +661,97 @@ export default function PricingPage() {
                                         ))}
                                     </ul>
                                 </div>
+
+                                {/* Linked Power-Ups */}
+                                {getHelperPowerUps(selectedHelper.id).length > 0 && (
+                                    <div className="bg-card rounded-2xl border border-border p-6">
+                                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                            <Zap className="w-5 h-5 text-amber-500" />
+                                            Relevant Power-Ups
+                                        </h3>
+                                        <ul className="grid md:grid-cols-2 gap-3">
+                                            {getHelperPowerUps(selectedHelper.id).map((powerup, index) => (
+                                                <li key={index} className="flex items-start gap-2.5">
+                                                    <span className="text-base">{powerup.emoji}</span>
+                                                    <span className="text-sm font-medium">{powerup.name}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {/* Linked Agent Templates */}
+                                {getHelperAgents(selectedHelper.id).length > 0 && (
+                                    <div className="bg-card rounded-2xl border border-border p-6">
+                                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                                            <Bot className="w-5 h-5 text-blue-500" />
+                                            Pre-built Agents
+                                        </h3>
+                                        <ul className="grid md:grid-cols-2 gap-3">
+                                            {getHelperAgents(selectedHelper.id).map((agent, index) => (
+                                                <li key={index} className="flex items-start gap-2.5">
+                                                    <span className="text-base">{agent.emoji}</span>
+                                                    <span className="text-sm font-medium">{agent.name}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </motion.div>
                         )}
 
                         {/* Bundle View - Main Features */}
                         {viewMode === 'bundle' && (
                             <>
+                                {/* Hero Card - Celio X Bundle */}
+                                <motion.div
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="max-w-5xl mx-auto mb-8"
+                                >
+                                    <div className="relative overflow-hidden rounded-3xl p-10 shadow-xl border-2 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700">
+                                        {/* Background Pattern */}
+                                        <div className="absolute inset-0 opacity-10">
+                                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.05)_25%,rgba(255,255,255,.05)_50%,transparent_50%,transparent_75%,rgba(255,255,255,.05)_75%,rgba(255,255,255,.05))] bg-[length:60px_60px]" />
+                                        </div>
+
+                                        <div className="relative flex items-center justify-between">
+                                            {/* Left Side - Content */}
+                                            <div className="flex-1 text-white">
+                                                <h2 className="text-4xl font-bold mb-3">
+                                                    Celio X
+                                                </h2>
+                                                <p className="text-2xl font-semibold mb-4">
+                                                    $38.80/month
+                                                </p>
+                                                <p className="text-lg text-white/95">
+                                                    All 12+ AI Helpers
+                                                </p>
+                                            </div>
+
+                                            {/* Right Side - Helper Avatars */}
+                                            <div className="flex-shrink-0 ml-8">
+                                                <div className="grid grid-cols-4 gap-2">
+                                                    {HELPERS.slice(0, 8).map((helper, index) => (
+                                                        <div
+                                                            key={helper.id}
+                                                            className={cn(
+                                                                "w-16 h-16 rounded-full flex items-center justify-center text-2xl",
+                                                                "bg-gradient-to-br shadow-lg transition-all hover:scale-110",
+                                                                helper.color,
+                                                                "animate-pulse"
+                                                            )}
+                                                            style={{ animationDelay: `${index * 0.1}s` }}
+                                                        >
+                                                            {helper.emoji}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </motion.div>
+
                                 {/* Everything Section */}
                                 <motion.div
                                     initial={{ opacity: 0, y: 20 }}
@@ -785,6 +961,10 @@ export default function PricingPage() {
                     </>
                 )}
             </AnimatePresence>
-        </div>
+            </div>
+            
+            {/* Footer */}
+            <Footer />
+        </>
     );
 }

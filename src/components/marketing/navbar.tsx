@@ -4,10 +4,18 @@ import Icons from "../global/icons";
 import Wrapper from "../global/wrapper";
 import { Button } from "../ui/button";
 import MobileMenu from "./mobile-menu";
+import { cn } from "@/lib";
 
-const Navbar = () => {
+interface NavbarProps {
+    sticky?: boolean;
+}
+
+const Navbar = ({ sticky = true }: NavbarProps) => {
     return (
-        <header className="sticky top-0 w-full h-16 bg-background/80 backdrop-blur-sm z-50">
+        <header className={cn(
+            "w-full h-16 bg-background/80 backdrop-blur-sm z-50",
+            sticky && "sticky top-0"
+        )}>
             <Wrapper className="h-full">
                 <div className="flex items-center justify-between h-full">
                     <div className="flex items-center">
