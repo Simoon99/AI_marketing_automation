@@ -11,7 +11,7 @@ export default function PowerUpsTab() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-3xl font-bold">Power Ups</h2>
+                <h2 className="text-3xl font-bold">Power Ups (20+)</h2>
                 <p className="text-muted-foreground mt-2">
                     Supercharge your marketing with AI-powered tools and features
                 </p>

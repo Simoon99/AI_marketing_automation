@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "cors": "npm:cors@^2.8.5",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@^2.39.3"
+  },
+  "compilerOptions": {
+    "types": [
+      "npm:@types/cors@^2.8.5"
+    ]
+  }
+}
+
