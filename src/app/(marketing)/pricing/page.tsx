@@ -370,7 +370,7 @@ function CountdownTimer() {
 
 export default function PricingPage() {
     const [viewMode, setViewMode] = useState<'individual' | 'bundle'>('individual');
-    const [selectedHelper, setSelectedHelper] = useState<Helper | null>(null);
+    const [selectedHelper, setSelectedHelper] = useState<Helper | null>(HELPERS[0]); // Default to first helper
     const [showPricingModal, setShowPricingModal] = useState(false);
     const [selectedPricingTier, setSelectedPricingTier] = useState<string>('yearly');
 
@@ -406,7 +406,7 @@ export default function PricingPage() {
                                 <button 
                                     onClick={() => {
                                         setViewMode('individual');
-                                        setSelectedHelper(null);
+                                        setSelectedHelper(HELPERS[0]); // Select first helper when switching to individual
                                     }}
                                     className={cn(
                                         "px-6 py-2.5 rounded-md font-medium transition-all text-sm",
@@ -433,6 +433,94 @@ export default function PricingPage() {
                                 </button>
                             </div>
                         </div>
+
+                        {/* Hero Card - Individual Helper */}
+                        {viewMode === 'individual' && selectedHelper && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="max-w-5xl mx-auto mb-8"
+                            >
+                                <div className={cn(
+                                    "relative overflow-hidden rounded-3xl p-10 shadow-xl border-2",
+                                    "bg-gradient-to-br",
+                                    selectedHelper.color
+                                )}>
+                                    <div className="relative flex items-center justify-between">
+                                        {/* Left Side - Content */}
+                                        <div className="flex-1">
+                                            <h2 className="text-4xl font-bold text-white mb-3">
+                                                {selectedHelper.name}
+                                            </h2>
+                                            <p className="text-xl text-white/90 mb-4">
+                                                ${selectedHelper.price}/month
+                                            </p>
+                                            <p className="text-lg text-white/95 mb-2">
+                                                {selectedHelper.description}
+                                            </p>
+                                        </div>
+
+                                        {/* Right Side - Large Emoji */}
+                                        <div className="flex-shrink-0 ml-8">
+                                            <div className="w-48 h-48 rounded-full bg-white/10 backdrop-blur-sm flex items-center justify-center text-9xl">
+                                                {selectedHelper.emoji}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
+
+                        {/* Hero Card - Celio X Bundle */}
+                        {viewMode === 'bundle' && (
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="max-w-5xl mx-auto mb-8"
+                            >
+                                <div className="relative overflow-hidden rounded-3xl p-10 shadow-xl border-2 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700">
+                                    {/* Background Pattern */}
+                                    <div className="absolute inset-0 opacity-10">
+                                        <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.05)_25%,rgba(255,255,255,.05)_50%,transparent_50%,transparent_75%,rgba(255,255,255,.05)_75%,rgba(255,255,255,.05))] bg-[length:60px_60px]" />
+                                    </div>
+
+                                    <div className="relative flex items-center justify-between">
+                                        {/* Left Side - Content */}
+                                        <div className="flex-1 text-white">
+                                            <h2 className="text-4xl font-bold mb-3">
+                                                Celio X
+                                            </h2>
+                                            <p className="text-2xl font-semibold mb-4">
+                                                <span className="line-through text-white/60">$97</span> $38.80/month
+                                            </p>
+                                            <p className="text-lg text-white/95">
+                                                All 12+ AI Helpers
+                                            </p>
+                                        </div>
+
+                                        {/* Right Side - Helper Avatars */}
+                                        <div className="flex-shrink-0 ml-8">
+                                            <div className="grid grid-cols-4 gap-2">
+                                                {HELPERS.slice(0, 8).map((helper, index) => (
+                                                    <div
+                                                        key={helper.id}
+                                                        className={cn(
+                                                            "w-16 h-16 rounded-full flex items-center justify-center text-2xl",
+                                                            "bg-gradient-to-br shadow-lg transition-all hover:scale-110",
+                                                            helper.color,
+                                                            "animate-pulse"
+                                                        )}
+                                                        style={{ animationDelay: `${index * 0.1}s` }}
+                                                    >
+                                                        {helper.emoji}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
 
                         {/* Individual Helpers Row */}
                         {viewMode === 'individual' && (
@@ -464,45 +552,23 @@ export default function PricingPage() {
                             </div>
                         )}
 
-                        {/* Individual Helper Details - Below avatars */}
+                        {/* Individual Helper Benefits - Below avatars */}
                         {viewMode === 'individual' && selectedHelper && (
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="max-w-4xl mx-auto mb-12"
                             >
-                                <div className={cn(
-                                    "relative overflow-hidden rounded-2xl p-8 shadow-lg border",
-                                    "bg-gradient-to-br",
-                                    selectedHelper.color
-                                )}>
-                                    <div className="relative">
-                                        <div className="flex items-center gap-4 mb-6">
-                                            <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-4xl">
-                                                {selectedHelper.emoji}
-                                            </div>
-                                            <div className="flex-1">
-                                                <h2 className="text-2xl font-bold text-white mb-1">
-                                                    {selectedHelper.name}
-                                                </h2>
-                                                <p className="text-base text-white/90">
-                                                    {selectedHelper.description}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5">
-                                            <h3 className="text-base font-semibold text-white mb-3">What's included:</h3>
-                                            <ul className="space-y-2">
-                                                {selectedHelper.benefits.map((benefit, index) => (
-                                                    <li key={index} className="flex items-start gap-2.5 text-white/95">
-                                                        <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                                        <span className="text-sm">{benefit}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
+                                <div className="bg-card rounded-2xl border border-border p-6">
+                                    <h3 className="text-lg font-semibold mb-4">What's included:</h3>
+                                    <ul className="grid md:grid-cols-2 gap-3">
+                                        {selectedHelper.benefits.map((benefit, index) => (
+                                            <li key={index} className="flex items-start gap-2.5">
+                                                <Check className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary" />
+                                                <span className="text-sm">{benefit}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             </motion.div>
                         )}
