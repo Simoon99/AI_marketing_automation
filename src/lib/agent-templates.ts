@@ -18,6 +18,7 @@ export interface AgentTemplate {
   category: string;
   color: string;
   parameters: AgentParameter[];
+  businessAreas: string[]; // Tags for filtering by business area
 }
 
 export const agentTemplates: AgentTemplate[] = [

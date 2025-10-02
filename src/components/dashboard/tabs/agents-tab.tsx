@@ -9,8 +9,22 @@ import type { Agent, AgentExecution } from "@/lib/types/agent";
 import { agentTemplates, type AgentTemplate, type AgentParameter } from "@/lib/agent-templates";
 import { IntegrationsModal } from "@/components/dashboard/integrations-modal";
 import { AgentCustomizationModal } from "@/components/dashboard/agent-customization-modal";
+import { ManualAgentModal, type ManualAgentData } from "@/components/dashboard/manual-agent-modal";
+import { Filter } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
-type ViewMode = 'new-agent' | 'my-agents' | 'configure' | 'details';
+type ViewMode = 'new-agent' | 'my-agents' | 'configure' | 'details' | 'manual-create';
+
+const BUSINESS_AREAS = [
+    { id: 'all', label: 'All Categories' },
+    { id: 'marketing', label: 'Marketing' },
+    { id: 'sales', label: 'Sales' },
+    { id: 'finance', label: 'Finance' },
+    { id: 'operations', label: 'Operations' },
+    { id: 'customer', label: 'Customer Support' },
+    { id: 'content', label: 'Content' },
+    { id: 'analytics', label: 'Analytics' },
+];
 
 export default function AgentsTab() {
     const [agents, setAgents] = useState<Agent[]>([]);
@@ -27,7 +41,9 @@ export default function AgentsTab() {
     const [executing, setExecuting] = useState<string | null>(null);
     const [showIntegrationsModal, setShowIntegrationsModal] = useState(false);
     const [showCustomizationModal, setShowCustomizationModal] = useState(false);
+    const [showManualModal, setShowManualModal] = useState(false);
     const [draftAgentConfig, setDraftAgentConfig] = useState<any>(null);
+    const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
     useEffect(() => {
         loadAgents();
@@ -88,6 +104,39 @@ export default function AgentsTab() {
     const handleCancelCustomization = () => {
         setShowCustomizationModal(false);
         setDraftAgentConfig(null);
+    };
+
+    const handleManualAgentCreate = async (agentData: ManualAgentData) => {
+        setCreating(true);
+        try {
+            const config = {
+                name: agentData.name,
+                description: agentData.description || 'Manually created agent',
+                trigger_type: agentData.trigger_type,
+                schedule: agentData.schedule,
+                integrations: agentData.integrations,
+                llm: {
+                    model: 'gpt-4-turbo-preview',
+                    temperature: 0.7,
+                },
+                steps: agentData.steps,
+            };
+
+            const prompt = `Manual agent: ${agentData.name}. ${agentData.description}`;
+            const result = await automationEngine.deployAgent(prompt, config);
+
+            if (result.success && result.agent) {
+                toast.success(`Agent "${result.agent.name}" created successfully!`);
+                setShowManualModal(false);
+                await loadAgents();
+            } else {
+                toast.error(result.error || "Failed to create agent");
+            }
+        } catch (error: any) {
+            toast.error(error.message || "Failed to create agent");
+        } finally {
+            setCreating(false);
+        }
     };
 
     const handleTemplateClick = (template: AgentTemplate) => {
@@ -576,12 +625,52 @@ export default function AgentsTab() {
                         <div className="max-w-6xl mx-auto space-y-8">
                             {/* Agent Templates */}
                     <div>
-                                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                                    <Sparkles className="w-5 h-5 text-yellow-500" />
-                                    Agent Templates (20+)
-                        </h2>
+                                <div className="flex items-center justify-between mb-4">
+                                    <h2 className="text-xl font-semibold flex items-center gap-2">
+                                        <Sparkles className="w-5 h-5 text-yellow-500" />
+                                        Agent Templates (20+)
+                                    </h2>
+                                    <Button
+                                        onClick={() => setShowManualModal(true)}
+                                        variant="outline"
+                                        className="gap-2"
+                                    >
+                                        <Settings className="w-4 h-4" />
+                                        Create Manually
+                                    </Button>
+                                </div>
+
+                                {/* Category Filter */}
+                                <div className="flex flex-wrap items-center gap-2 mb-4">
+                                    <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
+                                        <Filter className="w-4 h-4" />
+                                        <span>Filter:</span>
+                                    </div>
+                                    {BUSINESS_AREAS.map((area) => {
+                                        const count = selectedCategory === 'all'
+                                            ? agentTemplates.length
+                                            : agentTemplates.filter(t => t.category.toLowerCase().includes(area.id)).length;
+                                        return (
+                                            <Button
+                                                key={area.id}
+                                                variant={selectedCategory === area.id ? "default" : "outline"}
+                                                size="sm"
+                                                onClick={() => setSelectedCategory(area.id)}
+                                                className="rounded-full text-xs h-7"
+                                            >
+                                                {area.label}
+                                            </Button>
+                                        );
+                                    })}
+                                </div>
+
                                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {agentTemplates.map((template) => (
+                                    {agentTemplates
+                                        .filter(template => 
+                                            selectedCategory === 'all' || 
+                                            template.category.toLowerCase().includes(selectedCategory)
+                                        )
+                                        .map((template) => (
                                         <button
                                             key={template.id}
                                             onClick={() => handleTemplateClick(template)}
@@ -601,6 +690,15 @@ export default function AgentsTab() {
                                         </button>
                                     ))}
                                 </div>
+
+                                {agentTemplates.filter(template => 
+                                    selectedCategory === 'all' || 
+                                    template.category.toLowerCase().includes(selectedCategory)
+                                ).length === 0 && (
+                                    <div className="text-center py-12 text-muted-foreground">
+                                        No agent templates found for this category
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -733,6 +831,12 @@ export default function AgentsTab() {
             onSave={handleDeployAgent}
             onCancel={handleCancelCustomization}
             isDeploying={deploying}
+        />
+        <ManualAgentModal
+            isOpen={showManualModal}
+            onClose={() => setShowManualModal(false)}
+            onSubmit={handleManualAgentCreate}
+            isCreating={creating}
         />
         </>
     );
