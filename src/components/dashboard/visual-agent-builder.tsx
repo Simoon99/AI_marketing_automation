@@ -192,7 +192,6 @@ function CustomNode({ data }: { data: any }) {
           "w-64 bg-card border-2 border-border rounded-xl shadow-lg hover:shadow-xl transition-all",
           data.selected && "border-primary ring-2 ring-primary/20"
         )}
-        onClick={() => data.onSelect?.(data.id)}
       >
         {/* Header */}
         <div className={cn("bg-gradient-to-br p-3 rounded-t-xl flex items-center gap-2", getNodeColor())}>
@@ -343,30 +342,29 @@ export function VisualAgentBuilder({
   const [testing, setTesting] = useState(false);
   const [nodePosition, setNodePosition] = useState<{ x: number; y: number } | null>(null);
   const [tipDismissed, setTipDismissed] = useState(false);
-  
-  // Use ref to store current nodes to avoid infinite loop
+
+  // Keep a ref to the latest nodes to avoid stale closures
   const nodesRef = useRef<Node[]>([]);
   useEffect(() => {
     nodesRef.current = nodes;
   }, [nodes]);
 
-  // Handler functions
+  // Handler functions - stable callbacks
   const handleNodeSelect = useCallback((nodeId: string) => {
     console.log('Node selected:', nodeId); // Debug log
     
-    // Find the node from current nodes using ref (no dependency on nodes)
+    // Use ref to access current nodes without triggering updates
     const node = nodesRef.current.find(n => n.id === nodeId);
-    if (!node) {
+    if (node) {
+      console.log('Found node:', node.id, 'Type:', node.data.type);
+      setSelectedNode(nodeId);
+      setEditingNode({ ...node.data }); // Clone the data to avoid reference issues
+      setNodePosition({ x: node.position.x, y: node.position.y });
+      setShowNodePanel(true);
+    } else {
       console.warn('Node not found:', nodeId);
-      return;
     }
-    
-    // Update all state at once
-    setSelectedNode(nodeId);
-    setEditingNode({ ...node.data }); // Clone the data to avoid reference issues
-    setNodePosition({ x: node.position.x, y: node.position.y });
-    setShowNodePanel(true);
-  }, []); // No dependencies - stable reference
+  }, []);
 
   const handleNodeDelete = useCallback((nodeId: string) => {
     if (nodeId === 'trigger') return; // Don't delete trigger
@@ -669,7 +667,7 @@ export function VisualAgentBuilder({
             </Button>
             <Button onClick={handleSaveWorkflow} className="gap-2">
               <Save className="w-4 h-4" />
-              Save Workflow
+              Save Agent
             </Button>
           </div>
         </div>
