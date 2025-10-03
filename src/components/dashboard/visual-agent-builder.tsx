@@ -52,7 +52,10 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
-  TestTube
+  TestTube,
+  GitBranch,
+  Filter,
+  RotateCw
 } from 'lucide-react';
 import { cn } from '@/lib';
 import { Badge } from '@/components/ui/badge';
@@ -70,6 +73,14 @@ function CustomNode({ data }: { data: any }) {
         return <Brain className="w-5 h-5 text-white" />;
       case 'action':
         return <Send className="w-5 h-5 text-white" />;
+      case 'condition':
+        return <GitBranch className="w-5 h-5 text-white" />;
+      case 'delay':
+        return <Clock className="w-5 h-5 text-white" />;
+      case 'filter':
+        return <Filter className="w-5 h-5 text-white" />;
+      case 'loop':
+        return <RotateCw className="w-5 h-5 text-white" />;
       default:
         return <Settings className="w-5 h-5 text-white" />;
     }
@@ -85,6 +96,14 @@ function CustomNode({ data }: { data: any }) {
         return 'from-orange-500 to-orange-600';
       case 'action':
         return 'from-green-500 to-green-600';
+      case 'condition':
+        return 'from-yellow-500 to-yellow-600';
+      case 'delay':
+        return 'from-pink-500 to-pink-600';
+      case 'filter':
+        return 'from-cyan-500 to-cyan-600';
+      case 'loop':
+        return 'from-indigo-500 to-indigo-600';
       default:
         return 'from-gray-500 to-gray-600';
     }
@@ -419,7 +438,7 @@ export function VisualAgentBuilder({
     [setEdges, handleEdgeDelete]
   );
 
-  const addNode = (type: 'fetch' | 'process' | 'action') => {
+  const addNode = (type: 'fetch' | 'process' | 'action' | 'condition' | 'delay' | 'filter' | 'loop') => {
     const newNodeId = `step-${Date.now()}`;
     const lastNode = nodes[nodes.length - 1];
     const yPosition = lastNode ? lastNode.position.y + 180 : 200;
@@ -632,6 +651,7 @@ export function VisualAgentBuilder({
             edgeTypes={edgeTypes}
             fitView
             className="bg-muted/20"
+            proOptions={{ hideAttribution: true }}
             defaultEdgeOptions={{
               type: 'custom',
               animated: true,
@@ -649,6 +669,10 @@ export function VisualAgentBuilder({
                   case 'fetch': return '#3b82f6';
                   case 'process': return '#f97316';
                   case 'action': return '#22c55e';
+                  case 'condition': return '#eab308';
+                  case 'delay': return '#ec4899';
+                  case 'filter': return '#06b6d4';
+                  case 'loop': return '#6366f1';
                   default: return '#6b7280';
                 }
               }}
@@ -674,26 +698,54 @@ export function VisualAgentBuilder({
                     Add Node
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuContent align="start" className="w-64">
                   <DropdownMenuItem onClick={() => addNode('fetch')} className="gap-3 cursor-pointer">
                     <Database className="w-4 h-4 text-blue-500" />
                     <div>
                       <div className="font-medium">Fetch Data</div>
-                      <div className="text-xs text-muted-foreground">Get data from APIs</div>
+                      <div className="text-xs text-muted-foreground">Get data from APIs & services</div>
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => addNode('process')} className="gap-3 cursor-pointer">
                     <Brain className="w-4 h-4 text-orange-500" />
                     <div>
                       <div className="font-medium">Process Data</div>
-                      <div className="text-xs text-muted-foreground">Transform with AI</div>
+                      <div className="text-xs text-muted-foreground">Transform & analyze with AI</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => addNode('condition')} className="gap-3 cursor-pointer">
+                    <GitBranch className="w-4 h-4 text-yellow-500" />
+                    <div>
+                      <div className="font-medium">Condition</div>
+                      <div className="text-xs text-muted-foreground">Branch based on logic</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => addNode('filter')} className="gap-3 cursor-pointer">
+                    <Filter className="w-4 h-4 text-cyan-500" />
+                    <div>
+                      <div className="font-medium">Filter Data</div>
+                      <div className="text-xs text-muted-foreground">Filter & validate data</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => addNode('loop')} className="gap-3 cursor-pointer">
+                    <RotateCw className="w-4 h-4 text-indigo-500" />
+                    <div>
+                      <div className="font-medium">Loop</div>
+                      <div className="text-xs text-muted-foreground">Repeat actions for each item</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => addNode('delay')} className="gap-3 cursor-pointer">
+                    <Clock className="w-4 h-4 text-pink-500" />
+                    <div>
+                      <div className="font-medium">Delay</div>
+                      <div className="text-xs text-muted-foreground">Wait before continuing</div>
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => addNode('action')} className="gap-3 cursor-pointer">
                     <Send className="w-4 h-4 text-green-500" />
                     <div>
                       <div className="font-medium">Take Action</div>
-                      <div className="text-xs text-muted-foreground">Send or trigger events</div>
+                      <div className="text-xs text-muted-foreground">Send & trigger events</div>
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -1059,61 +1111,66 @@ export function VisualAgentBuilder({
                     <>
                       <div className="h-px bg-border" />
                       
-                      <div className="space-y-2">
-                        <Label htmlFor="node-integration" className="text-sm font-semibold flex items-center gap-1.5">
-                          <span className="text-primary">●</span>
-                          Integration
-                        </Label>
-                        <Select
-                          value={editingNode.integration || ''}
-                          onValueChange={(value) =>
-                            setEditingNode({ ...editingNode, integration: value })
-                          }
-                        >
-                          <SelectTrigger className="h-10">
-                            <SelectValue placeholder="Select integration..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="openai">🤖 OpenAI</SelectItem>
-                            <SelectItem value="sendgrid">📧 SendGrid</SelectItem>
-                            <SelectItem value="slack">💬 Slack</SelectItem>
-                            <SelectItem value="gmail">✉️ Gmail</SelectItem>
-                            <SelectItem value="google-sheets">📊 Google Sheets</SelectItem>
-                            <SelectItem value="airtable">🗂️ Airtable</SelectItem>
-                            <SelectItem value="hubspot">🎯 HubSpot</SelectItem>
-                            <SelectItem value="stripe">💳 Stripe</SelectItem>
-                            <SelectItem value="twilio">📱 Twilio</SelectItem>
-                            <SelectItem value="mailchimp">🐵 Mailchimp</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1">
-                          <span className="opacity-50">→</span>
-                          The service this node connects to
-                        </p>
-                      </div>
-
-                      {/* API Key / Credentials Section */}
-                      {editingNode.integration && (
-                        <div className="space-y-2">
-                          <Label className="text-sm font-semibold flex items-center gap-1.5">
-                            <span className="text-yellow-500">🔑</span>
-                            API Key / Credentials
-                          </Label>
-                          <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-md p-2.5">
-                            <p className="text-xs text-amber-800 dark:text-amber-300 mb-2">
-                              This integration requires authentication
-                            </p>
-                            <Input
-                              placeholder={`Enter ${editingNode.integration} API key...`}
-                              className="h-9 text-xs font-mono mb-2"
-                              type="password"
-                            />
-                            <p className="text-[10px] text-muted-foreground">
-                              💡 <strong>Tip:</strong> For better security, set up integrations in{' '}
-                              <span className="text-primary underline cursor-pointer">Manage Integrations</span> instead
+                      {/* Integration field - Only for nodes that need API connections */}
+                      {(editingNode.type === 'fetch' || editingNode.type === 'process' || editingNode.type === 'action') && (
+                        <>
+                          <div className="space-y-2">
+                            <Label htmlFor="node-integration" className="text-sm font-semibold flex items-center gap-1.5">
+                              <span className="text-primary">●</span>
+                              Integration
+                            </Label>
+                            <Select
+                              value={editingNode.integration || ''}
+                              onValueChange={(value) =>
+                                setEditingNode({ ...editingNode, integration: value })
+                              }
+                            >
+                              <SelectTrigger className="h-10">
+                                <SelectValue placeholder="Select integration..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="openai">🤖 OpenAI</SelectItem>
+                                <SelectItem value="sendgrid">📧 SendGrid</SelectItem>
+                                <SelectItem value="slack">💬 Slack</SelectItem>
+                                <SelectItem value="gmail">✉️ Gmail</SelectItem>
+                                <SelectItem value="google-sheets">📊 Google Sheets</SelectItem>
+                                <SelectItem value="airtable">🗂️ Airtable</SelectItem>
+                                <SelectItem value="hubspot">🎯 HubSpot</SelectItem>
+                                <SelectItem value="stripe">💳 Stripe</SelectItem>
+                                <SelectItem value="twilio">📱 Twilio</SelectItem>
+                                <SelectItem value="mailchimp">🐵 Mailchimp</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground flex items-center gap-1">
+                              <span className="opacity-50">→</span>
+                              The service this node connects to
                             </p>
                           </div>
-                        </div>
+
+                          {/* API Key / Credentials Section */}
+                          {editingNode.integration && (
+                            <div className="space-y-2">
+                              <Label className="text-sm font-semibold flex items-center gap-1.5">
+                                <span className="text-yellow-500">🔑</span>
+                                API Key / Credentials
+                              </Label>
+                              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-md p-2.5">
+                                <p className="text-xs text-amber-800 dark:text-amber-300 mb-2">
+                                  This integration requires authentication
+                                </p>
+                                <Input
+                                  placeholder={`Enter ${editingNode.integration} API key...`}
+                                  className="h-9 text-xs font-mono mb-2"
+                                  type="password"
+                                />
+                                <p className="text-[10px] text-muted-foreground">
+                                  💡 <strong>Tip:</strong> For better security, set up integrations in{' '}
+                                  <span className="text-primary underline cursor-pointer">Manage Integrations</span> instead
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </>
                       )}
 
                       <div className="space-y-2">
@@ -1161,6 +1218,36 @@ export function VisualAgentBuilder({
                                 <SelectItem value="add_subscriber">Add Subscriber</SelectItem>
                                 <SelectItem value="update_record">Update Record</SelectItem>
                                 <SelectItem value="create_record">Create Record</SelectItem>
+                              </>
+                            )}
+                            {editingNode.type === 'condition' && (
+                              <>
+                                <SelectItem value="if_then">If/Then</SelectItem>
+                                <SelectItem value="switch">Switch/Case</SelectItem>
+                                <SelectItem value="compare">Compare Values</SelectItem>
+                                <SelectItem value="exists">Check If Exists</SelectItem>
+                              </>
+                            )}
+                            {editingNode.type === 'delay' && (
+                              <>
+                                <SelectItem value="wait_fixed">Wait Fixed Time</SelectItem>
+                                <SelectItem value="wait_until">Wait Until Time</SelectItem>
+                                <SelectItem value="wait_condition">Wait For Condition</SelectItem>
+                              </>
+                            )}
+                            {editingNode.type === 'filter' && (
+                              <>
+                                <SelectItem value="filter_array">Filter Array</SelectItem>
+                                <SelectItem value="remove_duplicates">Remove Duplicates</SelectItem>
+                                <SelectItem value="validate">Validate Data</SelectItem>
+                                <SelectItem value="remove_empty">Remove Empty Values</SelectItem>
+                              </>
+                            )}
+                            {editingNode.type === 'loop' && (
+                              <>
+                                <SelectItem value="for_each">For Each Item</SelectItem>
+                                <SelectItem value="repeat_n">Repeat N Times</SelectItem>
+                                <SelectItem value="while">While Condition True</SelectItem>
                               </>
                             )}
                           </SelectContent>
@@ -1213,6 +1300,73 @@ export function VisualAgentBuilder({
                               <Textarea placeholder="Input: {{data_to_process}}" rows={2} className="text-xs resize-none" />
                               <Input placeholder="Model: gpt-4 (optional)" className="h-9 text-xs" />
                               <Textarea placeholder="Custom instructions (optional)" rows={2} className="text-xs resize-none" />
+                            </>
+                          )}
+                          {/* Condition parameters */}
+                          {(editingNode.action === 'if_then' || editingNode.action === 'compare' || editingNode.action === 'exists') && (
+                            <>
+                              <Input placeholder="Variable to check: {{step1.output}}" className="h-9 text-xs" />
+                              <Select defaultValue="equals">
+                                <SelectTrigger className="h-9 text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="equals">Equals</SelectItem>
+                                  <SelectItem value="not_equals">Not Equals</SelectItem>
+                                  <SelectItem value="contains">Contains</SelectItem>
+                                  <SelectItem value="greater_than">Greater Than</SelectItem>
+                                  <SelectItem value="less_than">Less Than</SelectItem>
+                                  <SelectItem value="is_empty">Is Empty</SelectItem>
+                                  <SelectItem value="is_not_empty">Is Not Empty</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Input placeholder="Value to compare: expected_value" className="h-9 text-xs" />
+                            </>
+                          )}
+                          {/* Delay parameters */}
+                          {(editingNode.action === 'wait_fixed' || editingNode.action === 'wait_until') && (
+                            <>
+                              {editingNode.action === 'wait_fixed' && (
+                                <>
+                                  <Input placeholder="Duration: 5" className="h-9 text-xs" type="number" />
+                                  <Select defaultValue="seconds">
+                                    <SelectTrigger className="h-9 text-xs">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="seconds">Seconds</SelectItem>
+                                      <SelectItem value="minutes">Minutes</SelectItem>
+                                      <SelectItem value="hours">Hours</SelectItem>
+                                      <SelectItem value="days">Days</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </>
+                              )}
+                              {editingNode.action === 'wait_until' && (
+                                <Input placeholder="Timestamp: 2024-12-31T23:59:59Z or {{variable}}" className="h-9 text-xs" />
+                              )}
+                            </>
+                          )}
+                          {/* Filter parameters */}
+                          {(editingNode.action === 'filter_array' || editingNode.action === 'validate') && (
+                            <>
+                              <Input placeholder="Array to filter: {{step1.items}}" className="h-9 text-xs" />
+                              <Textarea placeholder='Condition: item.status === "active"' rows={2} className="text-xs resize-none font-mono" />
+                            </>
+                          )}
+                          {/* Loop parameters */}
+                          {(editingNode.action === 'for_each' || editingNode.action === 'repeat_n' || editingNode.action === 'while') && (
+                            <>
+                              {editingNode.action === 'for_each' && (
+                                <Input placeholder="Array to iterate: {{step1.items}}" className="h-9 text-xs" />
+                              )}
+                              {editingNode.action === 'repeat_n' && (
+                                <Input placeholder="Number of times: 10" className="h-9 text-xs" type="number" />
+                              )}
+                              {editingNode.action === 'while' && (
+                                <Textarea placeholder='Condition: {{counter}} < 100' rows={2} className="text-xs resize-none font-mono" />
+                              )}
+                              <Input placeholder="Max iterations (safety): 1000" className="h-9 text-xs" type="number" />
                             </>
                           )}
                           {!editingNode.action && (
