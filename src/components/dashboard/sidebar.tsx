@@ -14,7 +14,7 @@ const navigation = [
 ];
 
 const agentSubNav = [
-    { name: "New Agent", href: "/dashboard/agents?view=new", icon: Plus, title: "Create new agent" },
+    { name: "New Agent", href: "/dashboard/agents?view=new&builder=true", icon: Plus, title: "Create new agent" },
     { name: "My Agents", href: "/dashboard/agents?view=my-agents", icon: Users, title: "View your agents" },
 ];
 

@@ -52,7 +52,21 @@ export default function AgentsTab() {
     // Handle URL parameters
     useEffect(() => {
         const view = searchParams.get('view');
-        if (view === 'new') {
+        const builder = searchParams.get('builder');
+        
+        if (view === 'new' && builder === 'true') {
+            // Open visual builder with empty template
+            handleOpenVisualBuilder(
+                {
+                    trigger: { type: 'manual' },
+                    steps: [],
+                    integrations: [],
+                    llm: { model: 'gpt-4-turbo-preview', temperature: 0.7 }
+                },
+                'New Agent',
+                'Build your agent visually'
+            );
+        } else if (view === 'new') {
             setViewMode('new-agent');
         } else if (view === 'my-agents') {
             setViewMode('my-agents');
@@ -769,7 +783,16 @@ export default function AgentsTab() {
                                 <h3 className="text-lg font-semibold mb-2">No agents yet</h3>
                                 <p className="text-muted-foreground mb-4">Create your first agent to get started</p>
                                 <Button
-                                    onClick={() => setViewMode('new-agent')}
+                                    onClick={() => handleOpenVisualBuilder(
+                                        {
+                                            trigger: { type: 'manual' },
+                                            steps: [],
+                                            integrations: [],
+                                            llm: { model: 'gpt-4-turbo-preview', temperature: 0.7 }
+                                        },
+                                        'New Agent',
+                                        'Build your agent visually'
+                                    )}
                                     className="gap-2"
                                 >
                                     <Plus className="w-4 h-4" />
@@ -777,6 +800,7 @@ export default function AgentsTab() {
                                 </Button>
                             </div>
                         ) : (
+                            <>
                             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {agents.map((agent) => (
                                     <div
@@ -856,6 +880,26 @@ export default function AgentsTab() {
                                     </div>
                                 ))}
                             </div>
+                            
+                            {/* Floating Create Agent Button */}
+                            <Button
+                                onClick={() => handleOpenVisualBuilder(
+                                    {
+                                        trigger: { type: 'manual' },
+                                        steps: [],
+                                        integrations: [],
+                                        llm: { model: 'gpt-4-turbo-preview', temperature: 0.7 }
+                                    },
+                                    'New Agent',
+                                    'Build your agent visually'
+                                )}
+                                className="fixed bottom-8 right-8 gap-2 shadow-2xl h-14 px-6 rounded-full z-20"
+                                size="lg"
+                            >
+                                <Plus className="w-5 h-5" />
+                                Create Agent
+                            </Button>
+                            </>
                         )}
                     </div>
                 </div>

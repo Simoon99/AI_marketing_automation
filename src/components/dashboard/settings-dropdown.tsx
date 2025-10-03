@@ -44,6 +44,29 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
     const renderSectionContent = () => {
         switch (activeSection) {
             case 'integrations':
+                const integrations = [
+                    { name: 'OpenAI', emoji: '🤖', connected: false },
+                    { name: 'SendGrid', emoji: '📧', connected: false },
+                    { name: 'Slack', emoji: '💬', connected: false },
+                    { name: 'Gmail', emoji: '✉️', connected: false },
+                    { name: 'Google Sheets', emoji: '📊', connected: false },
+                    { name: 'Airtable', emoji: '🗂️', connected: false },
+                    { name: 'HubSpot', emoji: '🎯', connected: false },
+                    { name: 'Stripe', emoji: '💳', connected: false },
+                    { name: 'Twilio', emoji: '📱', connected: false },
+                    { name: 'Mailchimp', emoji: '🐵', connected: false },
+                    { name: 'LinkedIn', emoji: '💼', connected: false },
+                    { name: 'Twitter', emoji: '🐦', connected: false },
+                    { name: 'Facebook', emoji: '📘', connected: false },
+                    { name: 'Instagram', emoji: '📸', connected: false },
+                    { name: 'Shopify', emoji: '🛍️', connected: false },
+                    { name: 'WooCommerce', emoji: '🛒', connected: false },
+                    { name: 'Zapier', emoji: '⚡', connected: false },
+                    { name: 'Make', emoji: '🔧', connected: false },
+                    { name: 'Notion', emoji: '📝', connected: false },
+                    { name: 'Trello', emoji: '📋', connected: false },
+                ];
+                
                 return (
                     <div className="space-y-4">
                         <div>
@@ -52,23 +75,37 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
                                 Configure API keys and credentials for third-party services.
                             </p>
                         </div>
-                        <div className="flex items-center justify-center py-12">
-                            <button
-                                onClick={() => {
-                                    setIsOpen(false);
-                                    setShowIntegrationsModal(true);
-                                }}
-                                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center gap-2"
-                            >
-                                <Plug className="w-4 h-4" />
-                                Open Integrations Manager
-                            </button>
+                        
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                            {integrations.map((integration) => (
+                                <button
+                                    key={integration.name}
+                                    onClick={() => {
+                                        setIsOpen(false);
+                                        setShowIntegrationsModal(true);
+                                    }}
+                                    className="flex flex-col items-center gap-2 p-4 border border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
+                                >
+                                    <span className="text-3xl">{integration.emoji}</span>
+                                    <span className="text-xs font-medium text-center">{integration.name}</span>
+                                    {integration.connected && (
+                                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                                    )}
+                                </button>
+                            ))}
                         </div>
-                        <div className="space-y-2 text-sm text-muted-foreground">
-                            <p>✓ Connect 20+ services</p>
-                            <p>✓ Secure API key storage</p>
-                            <p>✓ Test connections</p>
-                            <p>✓ Manage credentials safely</p>
+                        
+                        <div className="mt-6 p-4 bg-muted/50 rounded-lg">
+                            <p className="text-sm text-muted-foreground mb-2">
+                                Click any integration to configure its API key and credentials.
+                            </p>
+                            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                <span>✓ Secure storage</span>
+                                <span>•</span>
+                                <span>✓ Test connections</span>
+                                <span>•</span>
+                                <span>✓ 20+ services</span>
+                            </div>
                         </div>
                     </div>
                 );
@@ -76,24 +113,60 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
                 return (
                     <div className="space-y-4">
                         <div>
-                            <h3 className="text-lg font-semibold mb-2">AI Brains Configuration</h3>
+                            <h3 className="text-lg font-semibold mb-2">Knowledge Base</h3>
                             <p className="text-sm text-muted-foreground mb-4">
-                                Configure and manage your AI brain settings for different assistants.
+                                Manage knowledge that your AI Helpers need to remember about you and your business.
                             </p>
                         </div>
-                        <div className="space-y-3">
-                            <div className="p-4 border rounded-lg">
-                                <h4 className="font-medium mb-1">Default Brain</h4>
-                                <p className="text-sm text-muted-foreground">GPT-4 Turbo - General purpose AI</p>
+                        
+                        <div className="space-y-4">
+                            {/* Add Knowledge Button */}
+                            <button className="w-full p-4 border-2 border-dashed border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-all text-sm text-muted-foreground flex items-center justify-center gap-2">
+                                <Brain className="w-4 h-4" />
+                                Add New Knowledge
+                            </button>
+                            
+                            {/* Example Knowledge Cards */}
+                            <div className="space-y-3">
+                                <div className="p-4 border rounded-lg bg-card">
+                                    <div className="flex items-start justify-between mb-2">
+                                        <h4 className="font-medium">Business Information</h4>
+                                        <span className="text-xs text-muted-foreground">Updated 2 days ago</span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mb-3">
+                                        Company name, industry, target audience, brand voice, and core values that helpers should know.
+                                    </p>
+                                    <button className="text-xs text-primary hover:underline">Edit Knowledge</button>
+                                </div>
+                                
+                                <div className="p-4 border rounded-lg bg-card">
+                                    <div className="flex items-start justify-between mb-2">
+                                        <h4 className="font-medium">Product Catalog</h4>
+                                        <span className="text-xs text-muted-foreground">Updated 1 week ago</span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mb-3">
+                                        List of products/services, pricing, features, and key selling points for accurate recommendations.
+                                    </p>
+                                    <button className="text-xs text-primary hover:underline">Edit Knowledge</button>
+                                </div>
+                                
+                                <div className="p-4 border rounded-lg bg-card">
+                                    <div className="flex items-start justify-between mb-2">
+                                        <h4 className="font-medium">Customer Preferences</h4>
+                                        <span className="text-xs text-muted-foreground">Updated 3 days ago</span>
+                                    </div>
+                                    <p className="text-sm text-muted-foreground mb-3">
+                                        Common customer questions, preferred communication style, and service level expectations.
+                                    </p>
+                                    <button className="text-xs text-primary hover:underline">Edit Knowledge</button>
+                                </div>
                             </div>
-                            <div className="p-4 border rounded-lg">
-                                <h4 className="font-medium mb-1">Creative Brain</h4>
-                                <p className="text-sm text-muted-foreground">GPT-4 - Enhanced creativity settings</p>
-                            </div>
-                            <div className="p-4 border rounded-lg">
-                                <h4 className="font-medium mb-1">Analytical Brain</h4>
-                                <p className="text-sm text-muted-foreground">Claude 3.5 - Data analysis focused</p>
-                            </div>
+                        </div>
+                        
+                        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                            <p className="text-sm text-blue-800 dark:text-blue-300">
+                                💡 <strong>Tip:</strong> The more context you provide, the better your Helpers can assist you. Knowledge is shared across all your AI Helpers.
+                            </p>
                         </div>
                     </div>
                 );
@@ -102,31 +175,61 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
                     <div className="space-y-4">
                         <div>
                             <h3 className="text-lg font-semibold mb-2">Subscription Management</h3>
-                            <p className="text-sm text-muted-foreground mb-4">
+                            <p className="text-sm text-muted-foreground mb-6">
                                 View your current plan and manage billing information.
                             </p>
                         </div>
-                        <div className="p-6 border rounded-lg bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20">
-                            <div className="flex items-center justify-between mb-4">
-                                <h4 className="text-xl font-bold">Pro Plan</h4>
-                                <span className="px-3 py-1 bg-blue-600 text-white text-xs rounded-full">Active</span>
+                        
+                        <div className="p-8 border rounded-lg bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/10 dark:to-purple-950/10">
+                            <div className="flex items-start justify-between mb-6">
+                                <div>
+                                    <h4 className="text-2xl font-bold mb-1">Pro Plan</h4>
+                                </div>
+                                <span className="px-4 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-full">Active</span>
                             </div>
-                            <p className="text-2xl font-bold mb-2">$49<span className="text-sm font-normal">/month</span></p>
-                            <p className="text-sm text-muted-foreground mb-4">Billed monthly</p>
-                            <div className="space-y-2 text-sm">
+                            
+                            <div className="mb-6">
+                                <p className="text-4xl font-bold mb-1">$49<span className="text-lg font-normal text-muted-foreground">/month</span></p>
+                                <p className="text-sm text-muted-foreground">Billed monthly</p>
+                            </div>
+                            
+                            <div className="space-y-3 text-sm mb-6">
                                 <div className="flex items-center gap-2">
-                                    <span className="text-green-600">✓</span>
-                                    <span>Unlimited agents</span>
+                                    <span className="text-green-600 text-lg">✓</span>
+                                    <span>Unlimited AI agents & workflows</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-green-600">✓</span>
-                                    <span>All Power Ups included</span>
+                                    <span className="text-green-600 text-lg">✓</span>
+                                    <span>Access to all 20+ Power Ups</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <span className="text-green-600">✓</span>
-                                    <span>Priority support</span>
+                                    <span className="text-green-600 text-lg">✓</span>
+                                    <span>12 specialized AI Helpers</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-green-600 text-lg">✓</span>
+                                    <span>Priority support & updates</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-green-600 text-lg">✓</span>
+                                    <span>Advanced analytics & insights</span>
                                 </div>
                             </div>
+                            
+                            <div className="flex gap-3">
+                                <button className="px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                                    Manage Billing
+                                </button>
+                                <button className="px-6 py-2.5 border border-border rounded-lg font-medium hover:bg-muted transition-colors">
+                                    View Invoices
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div className="p-4 bg-muted/50 rounded-lg">
+                            <p className="text-sm text-muted-foreground">
+                                Need to change your plan or cancel? Contact support or manage your subscription in the billing portal.
+                            </p>
                         </div>
                     </div>
                 );
