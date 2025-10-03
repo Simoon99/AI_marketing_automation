@@ -740,8 +740,8 @@ export function VisualAgentBuilder({
             </div>
 
             {/* Compact Tabs */}
-            <Tabs defaultValue="basic" className="flex-1 flex flex-col overflow-hidden">
-              <TabsList className="mx-3 mt-2 grid w-auto grid-cols-4 bg-muted/50 h-8">
+            <Tabs defaultValue="basic" className="flex-1 flex flex-col overflow-hidden min-h-0">
+              <TabsList className="mx-3 mt-2 grid w-auto grid-cols-4 bg-muted/50 h-8 flex-shrink-0">
                 <TabsTrigger value="basic" className="data-[state=active]:bg-background text-xs h-7">
                   <Settings className="w-3 h-3 mr-1" />
                   Basic
@@ -760,9 +760,10 @@ export function VisualAgentBuilder({
                 </TabsTrigger>
               </TabsList>
 
-              <ScrollArea className="flex-1">
-                {/* Basic Tab */}
-                <TabsContent value="basic" className="p-3 space-y-3 mt-0">
+              <ScrollArea className="flex-1 min-h-0 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 180px)' }}>
+                <div className="pr-3">
+                  {/* Basic Tab */}
+                  <TabsContent value="basic" className="p-3 space-y-3 mt-0">
                   {/* Compact Info Card */}
                   <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-md p-2">
                     <p className="text-xs text-blue-800 dark:text-blue-300 flex items-start gap-1.5">
@@ -1600,6 +1601,7 @@ export function VisualAgentBuilder({
                     </div>
                   </div>
                 </TabsContent>
+                </div>
               </ScrollArea>
             </Tabs>
 
