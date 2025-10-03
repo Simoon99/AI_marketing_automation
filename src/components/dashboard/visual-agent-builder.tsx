@@ -32,9 +32,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Badge } from '@/components/ui/badge';
 import { 
   Plus, 
   Trash2, 
@@ -55,10 +52,11 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
-  TestTube,
-  BarChart
+  TestTube
 } from 'lucide-react';
 import { cn } from '@/lib';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 // Custom Node Component
 function CustomNode({ data }: { data: any }) {
@@ -92,25 +90,25 @@ function CustomNode({ data }: { data: any }) {
     }
   };
 
-  // Status indicator for testing
+  // Status badge for test results
   const getStatusBadge = () => {
     if (data.testing) {
       return (
-        <div className="absolute -top-2 -right-2 z-10 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
+        <div className="absolute -top-2 -right-2 z-10 w-7 h-7 bg-blue-500 rounded-full flex items-center justify-center shadow-lg animate-pulse">
           <Loader2 className="w-4 h-4 text-white animate-spin" />
         </div>
       );
     }
     if (data.testStatus === 'success') {
       return (
-        <div className="absolute -top-2 -right-2 z-10 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow-lg">
+        <div className="absolute -top-2 -right-2 z-10 w-7 h-7 bg-green-500 rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-300">
           <CheckCircle className="w-4 h-4 text-white" />
         </div>
       );
     }
     if (data.testStatus === 'error') {
       return (
-        <div className="absolute -top-2 -right-2 z-10 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
+        <div className="absolute -top-2 -right-2 z-10 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center shadow-lg animate-in zoom-in duration-300">
           <XCircle className="w-4 h-4 text-white" />
         </div>
       );
@@ -282,11 +280,9 @@ export function VisualAgentBuilder({
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [showNodePanel, setShowNodePanel] = useState(false);
   const [editingNode, setEditingNode] = useState<any>(null);
-  
-  // Test Mode State
   const [testMode, setTestMode] = useState(false);
-  const [testResults, setTestResults] = useState<any>(null);
   const [testing, setTesting] = useState(false);
+  const [nodePosition, setNodePosition] = useState<{ x: number; y: number } | null>(null);
 
   // Handler functions
   const handleNodeSelect = useCallback((nodeId: string) => {
@@ -304,11 +300,12 @@ export function VisualAgentBuilder({
       }))
     );
     
-    // Find the node and show panel
+    // Find the node, show panel, and capture position
     setNodes((nds) => {
       const node = nds.find(n => n.id === nodeId);
       if (node) {
         setEditingNode(node.data);
+        setNodePosition({ x: node.position.x, y: node.position.y });
         setShowNodePanel(true);
       }
       return nds;
@@ -517,6 +514,57 @@ export function VisualAgentBuilder({
     onSave(config);
   };
 
+  const handleTestWorkflow = async () => {
+    if (nodes.length <= 1) return; // Need at least one node besides trigger
+    
+    setTesting(true);
+    
+    // Clear previous test states
+    setNodes((nds) =>
+      nds.map((n) => ({
+        ...n,
+        data: {
+          ...n.data,
+          testing: false,
+          testStatus: undefined,
+        },
+      }))
+    );
+    
+    // Test each node sequentially with animation
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i];
+      
+      // Mark as testing
+      setNodes((nds) =>
+        nds.map((n) => ({
+          ...n,
+          data: {
+            ...n.data,
+            testing: n.id === node.id,
+          },
+        }))
+      );
+      
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
+      // Mark as success
+      setNodes((nds) =>
+        nds.map((n) => ({
+          ...n,
+          data: {
+            ...n.data,
+            testing: false,
+            testStatus: n.id === node.id ? 'success' : n.data.testStatus,
+          },
+        }))
+      );
+    }
+    
+    setTesting(false);
+  };
+
   return (
     <div className="h-full w-full flex flex-col bg-background">
       {/* Header */}
@@ -538,8 +586,28 @@ export function VisualAgentBuilder({
               className="gap-2"
             >
               <TestTube className="w-4 h-4" />
-              {testMode ? "Exit Test Mode" : "Test Mode"}
+              {testMode ? "Exit Test" : "Test Mode"}
             </Button>
+            {testMode && (
+              <Button 
+                variant="secondary" 
+                onClick={handleTestWorkflow}
+                disabled={testing || nodes.length <= 1}
+                className="gap-2"
+              >
+                {testing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Testing...
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-4 h-4" />
+                    Run Test
+                  </>
+                )}
+              </Button>
+            )}
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
@@ -634,244 +702,319 @@ export function VisualAgentBuilder({
           </ReactFlow>
         </div>
 
-        {/* Test Mode Panel */}
-        {testMode && (
-          <div className="w-96 border-l border-border bg-card flex flex-col shadow-xl">
-            {/* Header */}
-            <div className="p-4 border-b border-border bg-gradient-to-br from-green-500/10 to-blue-500/10">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-blue-500 flex items-center justify-center">
-                  <TestTube className="w-4 h-4 text-white" />
-                </div>
-                <h3 className="font-bold text-lg">Test Workflow</h3>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Test your entire workflow with sample data
-              </p>
-            </div>
-
-            {/* Content */}
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                {/* Test Input */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold">Test Input Data (JSON)</Label>
-                  <Textarea
-                    placeholder={`{
-  "email": "test@example.com",
-  "subject": "Test Email",
-  "data": "your test data"
-}`}
-                    rows={8}
-                    className="font-mono text-xs resize-none"
-                    defaultValue="{}"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    This data will be passed to the trigger node
-                  </p>
-                </div>
-
-                {/* Test Button */}
-                <Button 
-                  className="w-full gap-2" 
-                  size="lg"
-                  disabled={nodes.length <= 1}
-                  onClick={async () => {
-                    // Mock test execution
-                    setTesting(true);
-                    setTestResults(null);
-                    
-                    // Simulate testing each node
-                    for (let i = 0; i < nodes.length; i++) {
-                      const node = nodes[i];
-                      setNodes((nds) =>
-                        nds.map((n) => ({
-                          ...n,
-                          data: {
-                            ...n.data,
-                            testing: n.id === node.id,
-                          },
-                        }))
-                      );
-                      
-                      // Simulate processing time
-                      await new Promise(resolve => setTimeout(resolve, 1000));
-                      
-                      // Mark as success
-                      setNodes((nds) =>
-                        nds.map((n) => ({
-                          ...n,
-                          data: {
-                            ...n.data,
-                            testing: false,
-                            testStatus: n.id === node.id ? 'success' : n.data.testStatus,
-                          },
-                        }))
-                      );
-                    }
-                    
-                    // Show results
-                    setTestResults({
-                      success: true,
-                      executionTime: nodes.length * 1000,
-                      stepsExecuted: nodes.length,
-                      output: {
-                        status: "success",
-                        message: "Workflow executed successfully",
-                        processedData: "Sample output data"
-                      }
-                    });
-                    setTesting(false);
-                  }}
-                >
-                  {testing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Testing...
-                    </>
-                  ) : (
-                    <>
-                      <Play className="w-4 h-4" />
-                      Run Full Test
-                    </>
-                  )}
-                </Button>
-
-                {/* Test Results */}
-                {testResults && (
-                  <div className="space-y-3 animate-in slide-in-from-bottom-2">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-sm font-semibold">Test Results</Label>
-                      <Badge variant={testResults.success ? "default" : "destructive"}>
-                        {testResults.success ? "Success" : "Failed"}
-                      </Badge>
-                    </div>
-                    
-                    <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                        <span className="font-semibold text-sm">Workflow Passed!</span>
-                      </div>
-                      
-                      <div className="space-y-2 text-xs">
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Steps Executed:</span>
-                          <span className="font-mono font-medium">{testResults.stepsExecuted}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Execution Time:</span>
-                          <span className="font-mono font-medium">{testResults.executionTime}ms</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Average/Step:</span>
-                          <span className="font-mono font-medium">{Math.round(testResults.executionTime / testResults.stepsExecuted)}ms</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Output Preview */}
-                    <div className="space-y-2">
-                      <Label className="text-sm font-semibold">Output Data</Label>
-                      <div className="bg-muted/50 border border-border rounded-lg p-3">
-                        <pre className="text-xs font-mono whitespace-pre-wrap">
-                          {JSON.stringify(testResults.output, null, 2)}
-                        </pre>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Quick Tips */}
-                {!testResults && !testing && (
-                  <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/50 rounded-lg p-3 mt-4">
-                    <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-2">💡 Testing Tips</p>
-                    <ul className="text-xs text-blue-800 dark:text-blue-400 space-y-1">
-                      <li>• Add at least one node to test</li>
-                      <li>• Watch nodes light up as they execute</li>
-                      <li>• Green ✓ = Success, Red × = Error</li>
-                      <li>• Check execution time for performance</li>
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </div>
-        )}
-      </div>
-
-      {/* Modal Overlay for Node Customization */}
-      <Dialog open={showNodePanel && !!editingNode} onOpenChange={(open) => !open && setShowNodePanel(false)}>
-        <DialogContent className="max-w-5xl h-[85vh] p-0 overflow-hidden">
-          {editingNode && (
-            <div className="h-full flex flex-col bg-gradient-to-b from-background to-muted/10">
-              {/* Header */}
-              <div className="flex-shrink-0 p-5 border-b border-border bg-background/80 backdrop-blur-sm">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                      <Edit className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">Customize Node</h3>
-                      <p className="text-xs text-muted-foreground">Configure behavior & integrations</p>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setShowNodePanel(false)}
-                    className="hover:bg-destructive/10"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </div>
+        {/* Top-Right Floating Node Editor Panel */}
+        {showNodePanel && editingNode && (
+          <div 
+            className="absolute top-4 right-4 z-50 w-[420px] max-h-[85vh] bg-background border-2 border-border rounded-xl shadow-2xl flex flex-col animate-in fade-in slide-in-from-right duration-300"
+          >
+            {/* Compact Header */}
+            <div className="flex-shrink-0 p-3 border-b border-border bg-gradient-to-r from-primary/5 to-transparent">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="capitalize font-medium">
-                    {editingNode.type} Node
-                </Badge>
-                {editingNode.integration && (
-                  <Badge variant="secondary" className="text-xs">
-                    {editingNode.integration}
-                  </Badge>
-                )}
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                    <Edit className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">Node Settings</h3>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <Badge variant="outline" className="capitalize text-xs h-5 px-1.5">
+                        {editingNode.type}
+                      </Badge>
+                      {editingNode.integration && (
+                        <Badge variant="secondary" className="text-xs h-5 px-1.5">
+                          {editingNode.integration}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowNodePanel(false)}
+                  className="hover:bg-destructive/10 h-7 w-7 p-0"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
               </div>
             </div>
 
-            {/* Tabbed Content */}
+            {/* Compact Tabs */}
             <Tabs defaultValue="basic" className="flex-1 flex flex-col overflow-hidden">
-              <TabsList className="mx-4 mt-4 grid w-auto grid-cols-5 bg-muted/50">
-                <TabsTrigger value="basic" className="data-[state=active]:bg-background">
-                  <Settings className="w-3.5 h-3.5 mr-1.5" />
+              <TabsList className="mx-3 mt-2 grid w-auto grid-cols-4 bg-muted/50 h-8">
+                <TabsTrigger value="basic" className="data-[state=active]:bg-background text-xs h-7">
+                  <Settings className="w-3 h-3 mr-1" />
                   Basic
                 </TabsTrigger>
-                <TabsTrigger value="config" className="data-[state=active]:bg-background">
-                  <Zap className="w-3.5 h-3.5 mr-1.5" />
+                <TabsTrigger value="config" className="data-[state=active]:bg-background text-xs h-7">
+                  <Zap className="w-3 h-3 mr-1" />
                   Config
                 </TabsTrigger>
-                <TabsTrigger value="data" className="data-[state=active]:bg-background">
-                  <Database className="w-3.5 h-3.5 mr-1.5" />
+                <TabsTrigger value="data" className="data-[state=active]:bg-background text-xs h-7">
+                  <Database className="w-3 h-3 mr-1" />
                   Data
                 </TabsTrigger>
-                <TabsTrigger value="advanced" className="data-[state=active]:bg-background">
-                  <Code className="w-3.5 h-3.5 mr-1.5" />
+                <TabsTrigger value="advanced" className="data-[state=active]:bg-background text-xs h-7">
+                  <Code className="w-3 h-3 mr-1" />
                   Advanced
-                </TabsTrigger>
-                <TabsTrigger value="testing" className="data-[state=active]:bg-background">
-                  <TestTube className="w-3.5 h-3.5 mr-1.5" />
-                  Testing
                 </TabsTrigger>
               </TabsList>
 
               <ScrollArea className="flex-1">
                 {/* Basic Tab */}
-                <TabsContent value="basic" className="p-5 space-y-5 mt-0">
-                  {/* Info Card */}
-                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
-                    <p className="text-xs text-blue-800 dark:text-blue-300 flex items-start gap-2">
-                      <span className="text-sm">💡</span>
-                      <span>Configure the essential properties of this node. Give it a clear name and specify which service it connects to.</span>
+                <TabsContent value="basic" className="p-3 space-y-3 mt-0">
+                  {/* Compact Info Card */}
+                  <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-md p-2">
+                    <p className="text-xs text-blue-800 dark:text-blue-300 flex items-start gap-1.5">
+                      <span className="text-xs">💡</span>
+                      <span>Essential node properties. Set name and integration.</span>
                     </p>
                   </div>
+
+                  {/* Quick Setup with Premade Configurations */}
+                  {editingNode.type !== 'trigger' && (
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold flex items-center gap-1.5">
+                        <span className="text-green-500">⚡</span>
+                        Quick Setup
+                      </Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {/* Fetch Node Presets */}
+                        {editingNode.type === 'fetch' && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Fetch Emails',
+                                integration: 'gmail',
+                                action: 'fetch_emails',
+                                description: 'Retrieve unread emails from Gmail'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">✉️ Gmail Fetcher</span>
+                              <span className="text-[10px] text-muted-foreground">Get emails</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Fetch Sheets Data',
+                                integration: 'google-sheets',
+                                action: 'fetch_rows',
+                                description: 'Get data from Google Sheets'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">📊 Sheets Reader</span>
+                              <span className="text-[10px] text-muted-foreground">Read rows</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Fetch Contacts',
+                                integration: 'hubspot',
+                                action: 'fetch_contacts',
+                                description: 'Retrieve contacts from HubSpot'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">🎯 HubSpot Contacts</span>
+                              <span className="text-[10px] text-muted-foreground">Get contacts</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Fetch Records',
+                                integration: 'airtable',
+                                action: 'fetch_records',
+                                description: 'Get records from Airtable base'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">🗂️ Airtable Data</span>
+                              <span className="text-[10px] text-muted-foreground">Read records</span>
+                            </Button>
+                          </>
+                        )}
+
+                        {/* Process Node Presets */}
+                        {editingNode.type === 'process' && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'AI Summarizer',
+                                integration: 'openai',
+                                action: 'summarize',
+                                description: 'Summarize text using GPT-4'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">🤖 Summarize</span>
+                              <span className="text-[10px] text-muted-foreground">AI summary</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'AI Analyzer',
+                                integration: 'openai',
+                                action: 'analyze',
+                                description: 'Analyze data with AI insights'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">🤖 Analyze</span>
+                              <span className="text-[10px] text-muted-foreground">AI insights</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Content Generator',
+                                integration: 'openai',
+                                action: 'generate_content',
+                                description: 'Generate marketing content'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">🤖 Generate</span>
+                              <span className="text-[10px] text-muted-foreground">Create content</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Data Transformer',
+                                integration: 'openai',
+                                action: 'transform',
+                                description: 'Transform data structure'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">🤖 Transform</span>
+                              <span className="text-[10px] text-muted-foreground">Restructure</span>
+                            </Button>
+                          </>
+                        )}
+
+                        {/* Action Node Presets */}
+                        {editingNode.type === 'action' && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Send Email',
+                                integration: 'sendgrid',
+                                action: 'send_email',
+                                description: 'Send email via SendGrid'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">📧 Email</span>
+                              <span className="text-[10px] text-muted-foreground">Send message</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Post to Slack',
+                                integration: 'slack',
+                                action: 'send_message',
+                                description: 'Send message to Slack channel'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">💬 Slack</span>
+                              <span className="text-[10px] text-muted-foreground">Post message</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Update Sheet',
+                                integration: 'google-sheets',
+                                action: 'append_row',
+                                description: 'Add row to Google Sheets'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">📊 Sheets</span>
+                              <span className="text-[10px] text-muted-foreground">Add row</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Send SMS',
+                                integration: 'twilio',
+                                action: 'send_sms',
+                                description: 'Send SMS via Twilio'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">📱 SMS</span>
+                              <span className="text-[10px] text-muted-foreground">Text message</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Create Contact',
+                                integration: 'hubspot',
+                                action: 'create_contact',
+                                description: 'Add contact to HubSpot'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">🎯 Contact</span>
+                              <span className="text-[10px] text-muted-foreground">Add to CRM</span>
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingNode({
+                                ...editingNode,
+                                label: 'Add to Mailchimp',
+                                integration: 'mailchimp',
+                                action: 'add_subscriber',
+                                description: 'Add subscriber to list'
+                              })}
+                              className="h-auto py-2 px-2 flex flex-col items-start"
+                            >
+                              <span className="text-xs font-semibold">🐵 Subscribe</span>
+                              <span className="text-[10px] text-muted-foreground">Add to list</span>
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <span className="opacity-50">→</span>
+                        Click a preset to quickly configure this node
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="h-px bg-border" />
 
                   <div className="space-y-2">
                     <Label htmlFor="node-label" className="text-sm font-semibold flex items-center gap-1.5">
@@ -948,23 +1091,138 @@ export function VisualAgentBuilder({
                         </p>
                       </div>
 
+                      {/* API Key / Credentials Section */}
+                      {editingNode.integration && (
+                        <div className="space-y-2">
+                          <Label className="text-sm font-semibold flex items-center gap-1.5">
+                            <span className="text-yellow-500">🔑</span>
+                            API Key / Credentials
+                          </Label>
+                          <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-md p-2.5">
+                            <p className="text-xs text-amber-800 dark:text-amber-300 mb-2">
+                              This integration requires authentication
+                            </p>
+                            <Input
+                              placeholder={`Enter ${editingNode.integration} API key...`}
+                              className="h-9 text-xs font-mono mb-2"
+                              type="password"
+                            />
+                            <p className="text-[10px] text-muted-foreground">
+                              💡 <strong>Tip:</strong> For better security, set up integrations in{' '}
+                              <span className="text-primary underline cursor-pointer">Manage Integrations</span> instead
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
                       <div className="space-y-2">
                         <Label htmlFor="node-action" className="text-sm font-semibold flex items-center gap-1.5">
                           <span className="text-primary">●</span>
                           Action
                         </Label>
-                        <Input
-                          id="node-action"
+                        <Select
                           value={editingNode.action || ''}
-                          onChange={(e) =>
-                            setEditingNode({ ...editingNode, action: e.target.value })
+                          onValueChange={(value) =>
+                            setEditingNode({ ...editingNode, action: value })
                           }
-                          placeholder="e.g., send_email, fetch_data"
-                          className="h-10 font-mono text-sm"
-                        />
+                        >
+                          <SelectTrigger className="h-10">
+                            <SelectValue placeholder="Select action..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {/* Dynamic actions based on integration and node type */}
+                            {editingNode.type === 'fetch' && (
+                              <>
+                                <SelectItem value="fetch_data">Fetch Data</SelectItem>
+                                <SelectItem value="fetch_emails">Fetch Emails</SelectItem>
+                                <SelectItem value="fetch_rows">Fetch Rows</SelectItem>
+                                <SelectItem value="fetch_contacts">Fetch Contacts</SelectItem>
+                                <SelectItem value="fetch_records">Fetch Records</SelectItem>
+                              </>
+                            )}
+                            {editingNode.type === 'process' && (
+                              <>
+                                <SelectItem value="summarize">Summarize</SelectItem>
+                                <SelectItem value="analyze">Analyze</SelectItem>
+                                <SelectItem value="generate_content">Generate Content</SelectItem>
+                                <SelectItem value="transform">Transform Data</SelectItem>
+                                <SelectItem value="extract">Extract Information</SelectItem>
+                                <SelectItem value="classify">Classify</SelectItem>
+                              </>
+                            )}
+                            {editingNode.type === 'action' && (
+                              <>
+                                <SelectItem value="send_email">Send Email</SelectItem>
+                                <SelectItem value="send_message">Send Message</SelectItem>
+                                <SelectItem value="send_sms">Send SMS</SelectItem>
+                                <SelectItem value="append_row">Append Row</SelectItem>
+                                <SelectItem value="create_contact">Create Contact</SelectItem>
+                                <SelectItem value="add_subscriber">Add Subscriber</SelectItem>
+                                <SelectItem value="update_record">Update Record</SelectItem>
+                                <SelectItem value="create_record">Create Record</SelectItem>
+                              </>
+                            )}
+                          </SelectContent>
+                        </Select>
                         <p className="text-xs text-muted-foreground flex items-center gap-1">
                           <span className="opacity-50">→</span>
-                          The specific action this node performs
+                          The specific operation this node performs
+                        </p>
+                      </div>
+
+                      {/* Action Parameters */}
+                      <div className="space-y-2">
+                        <Label className="text-sm font-semibold flex items-center gap-1.5">
+                          <span className="text-purple-500">⚙️</span>
+                          Action Parameters
+                        </Label>
+                        <div className="space-y-2 bg-muted/30 p-2.5 rounded-md border border-border">
+                          {/* Email parameters */}
+                          {editingNode.action === 'send_email' && (
+                            <>
+                              <Input placeholder="To: email@example.com" className="h-9 text-xs" />
+                              <Input placeholder="Subject: {{subject}}" className="h-9 text-xs" />
+                              <Textarea placeholder="Body: Use {{variables}} from previous steps" rows={3} className="text-xs resize-none" />
+                            </>
+                          )}
+                          {/* Message parameters */}
+                          {(editingNode.action === 'send_message' || editingNode.action === 'send_sms') && (
+                            <>
+                              <Input placeholder="To: phone/channel" className="h-9 text-xs" />
+                              <Textarea placeholder="Message: {{content}}" rows={2} className="text-xs resize-none" />
+                            </>
+                          )}
+                          {/* Data parameters */}
+                          {(editingNode.action === 'append_row' || editingNode.action === 'create_record') && (
+                            <>
+                              <Input placeholder="Sheet/Table ID" className="h-9 text-xs" />
+                              <Textarea placeholder='Data: {"field": "{{value}}", ...}' rows={3} className="text-xs resize-none font-mono" />
+                            </>
+                          )}
+                          {/* Fetch parameters */}
+                          {(editingNode.action === 'fetch_data' || editingNode.action === 'fetch_rows') && (
+                            <>
+                              <Input placeholder="Resource ID (sheet, folder, etc)" className="h-9 text-xs" />
+                              <Input placeholder="Filter/Query (optional)" className="h-9 text-xs" />
+                            </>
+                          )}
+                          {/* Process parameters */}
+                          {(editingNode.action === 'summarize' || editingNode.action === 'analyze' || editingNode.action === 'generate_content') && (
+                            <>
+                              <Textarea placeholder="Input: {{data_to_process}}" rows={2} className="text-xs resize-none" />
+                              <Input placeholder="Model: gpt-4 (optional)" className="h-9 text-xs" />
+                              <Textarea placeholder="Custom instructions (optional)" rows={2} className="text-xs resize-none" />
+                            </>
+                          )}
+                          {!editingNode.action && (
+                            <p className="text-xs text-muted-foreground text-center py-2">
+                              Select an action to see available parameters
+                            </p>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <span className="opacity-50">→</span>
+                          Use {`{{variable}}`} to reference data from previous steps
                         </p>
                       </div>
                     </>
@@ -972,12 +1230,12 @@ export function VisualAgentBuilder({
                 </TabsContent>
 
                 {/* Configuration Tab */}
-                <TabsContent value="config" className="p-5 space-y-5 mt-0">
-                  {/* Info Card */}
-                  <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
-                    <p className="text-xs text-purple-800 dark:text-purple-300 flex items-start gap-2">
-                      <span className="text-sm">⚡</span>
-                      <span>Fine-tune how this node executes. Control retries, timeouts, and performance optimizations.</span>
+                <TabsContent value="config" className="p-3 space-y-3 mt-0">
+                  {/* Compact Info Card */}
+                  <div className="bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-800 rounded-md p-2">
+                    <p className="text-xs text-purple-800 dark:text-purple-300 flex items-start gap-1.5">
+                      <span className="text-xs">⚡</span>
+                      <span>Fine-tune execution: retries, timeouts, performance.</span>
                     </p>
                   </div>
 
@@ -1060,62 +1318,192 @@ export function VisualAgentBuilder({
                       </div>
                     </div>
                   </div>
+
+                  <div className="h-px bg-border" />
+
+                  {/* Conditional Execution Section */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground/80">
+                      <div className="w-1 h-4 bg-orange-500 rounded-full"></div>
+                      Conditional Execution
+                    </div>
+                    
+                    <div className="pl-3 space-y-3">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Run When Condition Meets</Label>
+                        <Select defaultValue="always">
+                          <SelectTrigger className="h-9">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="always">Always Run</SelectItem>
+                            <SelectItem value="previous_success">Previous Node Succeeded</SelectItem>
+                            <SelectItem value="previous_failed">Previous Node Failed</SelectItem>
+                            <SelectItem value="custom">Custom Condition</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Custom Condition (JavaScript)</Label>
+                        <Textarea
+                          placeholder='Example: {{previous.status}} === "success" && {{data.count}} > 10'
+                          rows={2}
+                          className="text-xs resize-none font-mono"
+                        />
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <span className="opacity-50">→</span>
+                          Node only runs if condition evaluates to true
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="h-px bg-border" />
+
+                  {/* Scheduling Section */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground/80">
+                      <div className="w-1 h-4 bg-blue-500 rounded-full"></div>
+                      Scheduling & Rate Limiting
+                    </div>
+                    
+                    <div className="pl-3 space-y-3">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium">Delay Before Execution</Label>
+                        <div className="flex gap-2">
+                          <Input type="number" placeholder="0" defaultValue="0" className="h-9 text-xs flex-1" />
+                          <Select defaultValue="seconds">
+                            <SelectTrigger className="h-9 w-24">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="seconds">Seconds</SelectItem>
+                              <SelectItem value="minutes">Minutes</SelectItem>
+                              <SelectItem value="hours">Hours</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <span className="opacity-50">→</span>
+                          Wait before executing this node
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50">
+                        <div className="space-y-0.5">
+                          <Label className="font-medium">Enable Rate Limiting</Label>
+                          <p className="text-xs text-muted-foreground">
+                            Limit how often this node runs
+                          </p>
+                        </div>
+                        <Switch />
+                      </div>
+                    </div>
+                  </div>
                 </TabsContent>
 
                 {/* Data Mapping Tab */}
-                <TabsContent value="data" className="p-4 space-y-4 mt-0">
-                  <div className="space-y-3">
-                    <div>
-                      <Label className="mb-2 block">Input Parameters</Label>
-                      <div className="space-y-2">
-                        <Input placeholder="Parameter name" />
-                        <Textarea
-                          placeholder="Parameter value or expression (e.g., {{previous.output}})"
-                          rows={2}
-                        />
-                        <Button variant="outline" size="sm" className="w-full">
-                          <Plus className="w-3 h-3 mr-1" />
-                          Add Parameter
-                        </Button>
-                      </div>
-                    </div>
+                <TabsContent value="data" className="p-3 space-y-3 mt-0">
+                  {/* Info Card */}
+                  <div className="bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-800 rounded-md p-2">
+                    <p className="text-xs text-cyan-800 dark:text-cyan-300 flex items-start gap-1.5">
+                      <span className="text-xs">📊</span>
+                      <span>Configure how data flows through this node.</span>
+                    </p>
+                  </div>
 
+                  {/* Output Mapping */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold flex items-center gap-1.5">
+                      <span className="text-green-500">📤</span>
+                      Output Configuration
+                    </Label>
                     <div className="space-y-2">
-                      <Label>Output Path</Label>
                       <Input
-                        placeholder="e.g., data.results"
-                        defaultValue="output"
+                        placeholder="Output variable name (e.g., emailData)"
+                        className="h-9 text-xs"
                       />
-                      <p className="text-xs text-muted-foreground">
-                        Where to store this node's output
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>Data Transformation</Label>
-                      <Select defaultValue="none">
-                        <SelectTrigger>
+                      <Select defaultValue="json">
+                        <SelectTrigger className="h-9">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="none">No transformation</SelectItem>
-                          <SelectItem value="json">Parse as JSON</SelectItem>
-                          <SelectItem value="xml">Parse as XML</SelectItem>
-                          <SelectItem value="csv">Parse as CSV</SelectItem>
-                          <SelectItem value="custom">Custom function</SelectItem>
+                          <SelectItem value="json">JSON Object</SelectItem>
+                          <SelectItem value="array">Array</SelectItem>
+                          <SelectItem value="string">String</SelectItem>
+                          <SelectItem value="number">Number</SelectItem>
+                          <SelectItem value="boolean">Boolean</SelectItem>
                         </SelectContent>
                       </Select>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <span className="opacity-50">→</span>
+                        Save output as {`{{nodeName.outputVar}}`}
+                      </p>
                     </div>
+                  </div>
 
-                    <div className="p-3 bg-muted/50 rounded-lg space-y-1">
+                  <div className="h-px bg-border" />
+
+                  {/* Data Transformation */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold flex items-center gap-1.5">
+                      <span className="text-blue-500">🔄</span>
+                      Transform Output
+                    </Label>
+                    <Select defaultValue="none">
+                      <SelectTrigger className="h-9">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No transformation</SelectItem>
+                        <SelectItem value="json_parse">Parse JSON String</SelectItem>
+                        <SelectItem value="json_stringify">Convert to JSON String</SelectItem>
+                        <SelectItem value="flatten">Flatten Nested Object</SelectItem>
+                        <SelectItem value="filter">Filter Array Items</SelectItem>
+                        <SelectItem value="map">Map Array Values</SelectItem>
+                        <SelectItem value="custom">Custom JavaScript</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Textarea
+                      placeholder="Custom transformation code (JavaScript)..."
+                      rows={3}
+                      className="text-xs resize-none font-mono"
+                    />
+                  </div>
+
+                  <div className="h-px bg-border" />
+
+                  {/* Variable Reference Guide */}
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold flex items-center gap-1.5">
+                      <Code className="w-4 h-4" />
+                      Variable Reference Guide
+                    </Label>
+                    <div className="bg-muted/50 rounded-lg p-2.5 space-y-1.5 text-xs">
                       <div className="flex items-start gap-2">
-                        <Code className="w-4 h-4 mt-0.5 text-muted-foreground" />
-                        <div className="text-xs space-y-1">
-                          <p className="font-medium">Available Variables</p>
-                          <p className="text-muted-foreground">{`{{trigger.data}}`} - Trigger data</p>
-                          <p className="text-muted-foreground">{`{{step1.output}}`} - Previous node output</p>
-                          <p className="text-muted-foreground">{`{{env.API_KEY}}`} - Environment variable</p>
-                        </div>
+                        <span className="text-purple-500 font-mono">{`{{trigger.data}}`}</span>
+                        <span className="text-muted-foreground">Initial trigger data</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-purple-500 font-mono">{`{{step1.output}}`}</span>
+                        <span className="text-muted-foreground">Previous node output</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-purple-500 font-mono">{`{{nodeName.field}}`}</span>
+                        <span className="text-muted-foreground">Specific field from node</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-purple-500 font-mono">{`{{env.VAR}}`}</span>
+                        <span className="text-muted-foreground">Environment variable</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-purple-500 font-mono">{`{{$now}}`}</span>
+                        <span className="text-muted-foreground">Current timestamp</span>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <span className="text-purple-500 font-mono">{`{{$random}}`}</span>
+                        <span className="text-muted-foreground">Random UUID</span>
                       </div>
                     </div>
                   </div>
@@ -1212,118 +1600,22 @@ export function VisualAgentBuilder({
                     </div>
                   </div>
                 </TabsContent>
-
-                {/* Testing Tab */}
-                <TabsContent value="testing" className="p-5 space-y-5 mt-0">
-                  {/* Info Card */}
-                  <div className="bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                    <p className="text-xs text-green-800 dark:text-green-300 flex items-start gap-2">
-                      <span className="text-sm">🧪</span>
-                      <span>Test this node with sample data before deploying. See results in real-time and verify it works as expected.</span>
-                    </p>
-                  </div>
-
-                  {/* Test Status */}
-                  {editingNode?.testStatus && (
-                    <div className={cn(
-                      "p-4 rounded-lg border flex items-center gap-3",
-                      editingNode.testStatus === 'success' && "bg-green-50 dark:bg-green-950/30 border-green-200 dark:border-green-800",
-                      editingNode.testStatus === 'error' && "bg-red-50 dark:bg-red-950/30 border-red-200 dark:border-red-800",
-                      editingNode.testing && "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800"
-                    )}>
-                      {editingNode.testing && <Loader2 className="w-5 h-5 animate-spin text-blue-500" />}
-                      {editingNode.testStatus === 'success' && <CheckCircle className="w-5 h-5 text-green-500" />}
-                      {editingNode.testStatus === 'error' && <XCircle className="w-5 h-5 text-red-500" />}
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">
-                          {editingNode.testing && "Testing in progress..."}
-                          {editingNode.testStatus === 'success' && "Test passed successfully!"}
-                          {editingNode.testStatus === 'error' && "Test failed"}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Test Input Section */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-foreground/80">
-                      <div className="w-1 h-4 bg-primary rounded-full"></div>
-                      Test Input Data
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label className="text-sm font-medium">Mock Input (JSON)</Label>
-                      <Textarea
-                        placeholder={`{
-  "email": "test@example.com",
-  "name": "John Doe",
-  "data": "your test data here"
-}`}
-                        rows={8}
-                        className="font-mono text-xs resize-none"
-                        defaultValue="{}"
-                      />
-                      <p className="text-xs text-muted-foreground flex items-center gap-1">
-                        <span className="opacity-50">→</span>
-                        JSON data to test this node with. Must be valid JSON format.
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Test Actions */}
-                  <div className="space-y-3">
-                    <Button className="w-full gap-2" size="lg" disabled>
-                      <Play className="w-4 h-4" />
-                      Run Node Test
-                    </Button>
-                    <p className="text-xs text-center text-muted-foreground">
-                      Testing functionality coming soon! Full workflow testing available in Test Mode.
-                    </p>
-                  </div>
-
-                  {/* Test Results Placeholder */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label className="text-sm font-semibold">Test Results</Label>
-                      <Badge variant="secondary" className="text-xs">Not yet run</Badge>
-                    </div>
-                    <div className="border border-border rounded-lg p-6 bg-muted/30 text-center">
-                      <BarChart className="w-12 h-12 mx-auto mb-3 text-muted-foreground/50" />
-                      <p className="text-sm font-medium text-muted-foreground">No test results yet</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Click "Run Node Test" to see results here
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Quick Tips */}
-                  <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200/50 dark:border-blue-800/50 rounded-lg p-3">
-                    <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-2">💡 Testing Tips</p>
-                    <ul className="text-xs text-blue-800 dark:text-blue-400 space-y-1">
-                      <li>• Use realistic test data that matches your production data structure</li>
-                      <li>• Test both success and error scenarios</li>
-                      <li>• Check the full workflow using "Test Mode" on the canvas</li>
-                      <li>• Monitor execution time to optimize performance</li>
-                    </ul>
-                  </div>
-                </TabsContent>
               </ScrollArea>
             </Tabs>
 
-            {/* Footer Actions */}
-            <div className="flex-shrink-0 p-4 border-t border-border flex gap-2">
-              <Button onClick={handleSaveNode} className="flex-1">
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
+            {/* Compact Footer */}
+            <div className="flex-shrink-0 p-2.5 border-t border-border flex gap-2">
+              <Button onClick={handleSaveNode} size="sm" className="flex-1 h-8 text-xs">
+                <Save className="w-3 h-3 mr-1.5" />
+                Save
               </Button>
-              <Button variant="outline" onClick={() => setShowNodePanel(false)}>
+              <Button variant="outline" size="sm" onClick={() => setShowNodePanel(false)} className="h-8 text-xs">
                 Cancel
               </Button>
             </div>
           </div>
-          )}
-        </DialogContent>
-      </Dialog>
+        )}
+      </div>
     </div>
   );
 }
