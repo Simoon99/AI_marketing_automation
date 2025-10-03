@@ -309,26 +309,23 @@ export function VisualAgentBuilder({
     console.log('Node selected:', nodeId); // Debug log
     setSelectedNode(nodeId);
     
-    // Mark node as selected
-    setNodes((nds) =>
-      nds.map((n) => ({
+    // Mark node as selected, find it, and show panel - all in ONE state update
+    setNodes((nds) => {
+      const node = nds.find(n => n.id === nodeId);
+      if (node) {
+        setEditingNode({ ...node.data }); // Clone the data to avoid reference issues
+        setNodePosition({ x: node.position.x, y: node.position.y });
+        setShowNodePanel(true);
+      }
+      
+      // Return updated nodes with selection state
+      return nds.map((n) => ({
         ...n,
         data: {
           ...n.data,
           selected: n.id === nodeId,
         },
-      }))
-    );
-    
-    // Find the node, show panel, and capture position
-    setNodes((nds) => {
-      const node = nds.find(n => n.id === nodeId);
-      if (node) {
-        setEditingNode(node.data);
-        setNodePosition({ x: node.position.x, y: node.position.y });
-        setShowNodePanel(true);
-      }
-      return nds;
+      }));
     });
   }, []);
 
@@ -483,7 +480,7 @@ export function VisualAgentBuilder({
       ]);
     }
 
-    handleNodeSelect(newNodeId);
+    // Note: Node is added to canvas. Click the node to open configuration panel.
   };
 
   const updateNodeData = (nodeId: string, newData: any) => {
@@ -651,6 +648,11 @@ export function VisualAgentBuilder({
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             fitView
+            fitViewOptions={{
+              padding: 0.3,
+              maxZoom: 1,
+              minZoom: 0.5,
+            }}
             className="bg-muted/20"
             proOptions={{ hideAttribution: true }}
             defaultEdgeOptions={{
