@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Bot, Play, Pause, Trash2, Sparkles, CheckCircle2, XCircle, Clock, Loader2, ArrowUp, Plus, ArrowLeft, Settings2, Settings } from "lucide-react";
 import { automationEngine } from "@/lib/automation-engine";
 import { toast } from "sonner";
 import type { Agent, AgentExecution } from "@/lib/types/agent";
 import { agentTemplates, type AgentTemplate, type AgentParameter } from "@/lib/agent-templates";
-import { IntegrationsModal } from "@/components/dashboard/integrations-modal";
 import { AgentCustomizationModal } from "@/components/dashboard/agent-customization-modal";
 import { ManualAgentModal, type ManualAgentData } from "@/components/dashboard/manual-agent-modal";
 import { VisualAgentBuilder } from "@/components/dashboard/visual-agent-builder";
@@ -28,6 +28,7 @@ const BUSINESS_AREAS = [
 ];
 
 export default function AgentsTab() {
+    const searchParams = useSearchParams();
     const [agents, setAgents] = useState<Agent[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState(false);
@@ -40,7 +41,6 @@ export default function AgentsTab() {
     const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
     const [executions, setExecutions] = useState<AgentExecution[]>([]);
     const [executing, setExecuting] = useState<string | null>(null);
-    const [showIntegrationsModal, setShowIntegrationsModal] = useState(false);
     const [showCustomizationModal, setShowCustomizationModal] = useState(false);
     const [showManualModal, setShowManualModal] = useState(false);
     const [draftAgentConfig, setDraftAgentConfig] = useState<any>(null);
@@ -48,6 +48,16 @@ export default function AgentsTab() {
     const [visualBuilderConfig, setVisualBuilderConfig] = useState<any>(null);
     const [visualBuilderName, setVisualBuilderName] = useState<string>('');
     const [visualBuilderDesc, setVisualBuilderDesc] = useState<string>('');
+
+    // Handle URL parameters
+    useEffect(() => {
+        const view = searchParams.get('view');
+        if (view === 'new') {
+            setViewMode('new-agent');
+        } else if (view === 'my-agents') {
+            setViewMode('my-agents');
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         loadAgents();
@@ -607,46 +617,6 @@ export default function AgentsTab() {
         <>
         <div className="h-full overflow-y-auto bg-gradient-to-b from-background to-muted/20">
             <div className="min-h-full flex flex-col">
-                {/* Header with Tabs and Integrations Button */}
-                <div className="flex-shrink-0 px-6 pt-6 pb-2 border-b border-border bg-background/50 backdrop-blur-sm sticky top-0 z-10">
-                    <div className="max-w-6xl mx-auto flex justify-between items-center">
-                        {/* View Tabs */}
-                        <div className="flex gap-2">
-                            <Button 
-                                variant={viewMode === 'new-agent' || viewMode === 'visual-builder' ? 'default' : 'ghost'}
-                                onClick={() => setViewMode('new-agent')}
-                                className="gap-2"
-                            >
-                                <Workflow className="w-4 h-4" />
-                                New Agent
-                            </Button>
-                            <Button 
-                                variant={viewMode === 'my-agents' ? 'default' : 'ghost'}
-                                onClick={() => setViewMode('my-agents')}
-                                className="gap-2"
-                            >
-                                <Bot className="w-4 h-4" />
-                                My Agents
-                                {agents.length > 0 && (
-                                    <span className="ml-1 px-2 py-0.5 bg-primary/20 rounded-full text-xs">
-                                        {agents.length}
-                                    </span>
-                                )}
-                            </Button>
-                        </div>
-
-                        {/* Integrations Button */}
-                        <Button
-                            variant="outline"
-                            onClick={() => setShowIntegrationsModal(true)}
-                            className="gap-2"
-                        >
-                            <Settings className="w-4 h-4" />
-                            Manage Integrations
-                        </Button>
-                    </div>
-                </div>
-
                 {/* New Agent View - Prompt to Visual Builder */}
                 {viewMode === 'new-agent' && (
                 <>
@@ -894,10 +864,6 @@ export default function AgentsTab() {
         </div>
 
         {/* Modals */}
-        <IntegrationsModal
-            open={showIntegrationsModal}
-            onClose={() => setShowIntegrationsModal(false)}
-        />
         <AgentCustomizationModal
             open={showCustomizationModal}
             config={draftAgentConfig}

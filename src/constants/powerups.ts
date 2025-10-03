@@ -37,6 +37,7 @@ export type PowerUp = {
     category: string;
     isPopular?: boolean;
     isNew?: boolean;
+    hasTools?: boolean; // Indicates power-up has interactive tools/builder inside
     gradient: string;
     businessValue: string;
     businessAreas: string[]; // Tags for filtering by helper/business area
@@ -67,6 +68,7 @@ export const POWER_UPS: PowerUp[] = [
         category: "Advertising",
         isNew: true,
         isPopular: true,
+        hasTools: true, // Has ad builder tool
         gradient: "from-violet-500 to-purple-500",
         businessValue: "Create professional ads in minutes instead of hiring designers. Save $500-2000 per campaign.",
         businessAreas: ['marketing', 'social', 'ecommerce'],
@@ -89,6 +91,7 @@ export const POWER_UPS: PowerUp[] = [
         icon: FileText,
         category: "Conversion",
         isNew: true,
+        hasTools: true, // Has page builder tool
         gradient: "from-blue-500 to-cyan-500",
         businessValue: "Launch campaigns faster. Improve conversion rates by 25-40% with AI-optimized designs.",
         businessAreas: ['marketing', 'sales', 'ecommerce'],
@@ -111,6 +114,7 @@ export const POWER_UPS: PowerUp[] = [
         description: "Build complete sales funnels with order bumps, upsells, downsells, and thank you pages. Maximize revenue per customer.",
         icon: Zap,
         category: "Sales",
+        hasTools: true, // Has funnel builder tool
         gradient: "from-red-500 to-orange-500",
         businessValue: "Increase average order value by 30-80%. Turn $50 customers into $150+ customers.",
         businessAreas: ['sales', 'marketing', 'ecommerce'],
@@ -243,6 +247,7 @@ export const POWER_UPS: PowerUp[] = [
         description: "Generate engaging video scripts for YouTube, TikTok, Instagram Reels, and video ads. Hook, value, CTA included. Perfect for content creators.",
         icon: Video,
         category: "Content Creation",
+        hasTools: true, // Has script editor tool
         gradient: "from-pink-500 to-rose-500",
         businessValue: "Create video content 10x faster. Grow your audience with consistent, engaging videos.",
         businessAreas: ['content', 'social', 'marketing'],
@@ -253,6 +258,7 @@ export const POWER_UPS: PowerUp[] = [
         description: "Generate 30-90 day content plans for blog, social media, email, and video. Auto-schedule posts across platforms. Never run out of content ideas.",
         icon: Calendar,
         category: "Content Strategy",
+        hasTools: true, // Has calendar tool
         gradient: "from-teal-500 to-cyan-500",
         businessValue: "Stay consistent with content. Plan entire quarters in 30 minutes. Grow 3x faster with consistency.",
         businessAreas: ['content', 'marketing', 'social'],

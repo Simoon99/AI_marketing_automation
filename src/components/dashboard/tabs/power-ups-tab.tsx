@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib";
 import { POWER_UPS, BUSINESS_AREAS, PowerUp } from "@/constants/powerups";
-import { Filter } from "lucide-react";
+import { Filter, Wrench } from "lucide-react";
 
 export default function PowerUpsTab() {
     const [selectedArea, setSelectedArea] = useState<string | null>(null);
@@ -84,11 +84,19 @@ function PowerUpCard({ powerUp }: { powerUp: PowerUp }) {
 
                 <CardHeader>
                     <div className="flex items-start justify-between">
-                        <div className={cn(
-                            "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center",
-                            powerUp.gradient
-                        )}>
-                            <Icon className="w-6 h-6 text-white" />
+                        <div className="relative">
+                            <div className={cn(
+                                "w-12 h-12 rounded-xl bg-gradient-to-br flex items-center justify-center",
+                                powerUp.gradient
+                            )}>
+                                <Icon className="w-6 h-6 text-white" />
+                            </div>
+                            {/* Tool Icon Badge for power-ups with interactive tools */}
+                            {powerUp.hasTools && (
+                                <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-lg ring-2 ring-background">
+                                    <Wrench className="w-3.5 h-3.5 text-white" />
+                                </div>
+                            )}
                         </div>
                         <div className="flex gap-2">
                             {powerUp.isPopular && (

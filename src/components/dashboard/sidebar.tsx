@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib";
-import { Bot, MessageSquare, Sparkles, LogOut, ChevronRight, ChevronLeft } from "lucide-react";
+import { Bot, MessageSquare, Sparkles, LogOut, ChevronRight, ChevronLeft, Plus, Users } from "lucide-react";
 import { usePathname } from "next/navigation";
 import SettingsDropdown from "./settings-dropdown";
 
@@ -11,6 +11,11 @@ const navigation = [
     { name: "Agents", href: "/dashboard/agents", icon: Bot },
     { name: "Celio Helpers", href: "/dashboard/celio", icon: MessageSquare },
     { name: "Power Ups", href: "/dashboard/powerups", icon: Sparkles },
+];
+
+const agentSubNav = [
+    { name: "New Agent", href: "/dashboard/agents?view=new", icon: Plus, title: "Create new agent" },
+    { name: "My Agents", href: "/dashboard/agents?view=my-agents", icon: Users, title: "View your agents" },
 ];
 
 export default function DashboardSidebar() {
@@ -67,25 +72,66 @@ export default function DashboardSidebar() {
                 {navigation.map((item) => {
                     const Icon = item.icon;
                     const isActive = pathname === item.href;
+                    const isAgentsPage = pathname === "/dashboard/agents";
                     
                     return (
-                        <Link
-                            key={item.name}
-                            href={item.href}
-                            className={cn(
-                                "flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-300",
-                                isCollapsed ? "px-3 py-3 justify-center" : "px-3 py-2",
-                                isActive
-                                    ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                        <div key={item.name}>
+                            <Link
+                                href={item.href}
+                                className={cn(
+                                    "flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-300",
+                                    isCollapsed ? "px-3 py-3 justify-center" : "px-3 py-2",
+                                    isActive
+                                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                                        : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
+                                )}
+                                title={isCollapsed ? item.name : undefined}
+                            >
+                                <Icon className="w-5 h-5 flex-shrink-0" />
+                                {!isCollapsed && (
+                                    <span className="whitespace-nowrap overflow-hidden">{item.name}</span>
+                                )}
+                            </Link>
+
+                            {/* Agent Sub-Navigation (Icon Buttons) */}
+                            {item.name === "Agents" && !isCollapsed && isAgentsPage && (
+                                <div className="ml-8 mt-1 space-y-1">
+                                    {agentSubNav.map((subItem) => {
+                                        const SubIcon = subItem.icon;
+                                        return (
+                                            <Link
+                                                key={subItem.name}
+                                                href={subItem.href}
+                                                className="flex items-center gap-2 px-2 py-1.5 rounded-md text-xs text-sidebar-foreground/80 hover:bg-sidebar-accent/30 hover:text-sidebar-accent-foreground transition-all"
+                                                title={subItem.title}
+                                            >
+                                                <SubIcon className="w-4 h-4 flex-shrink-0" />
+                                                <span className="whitespace-nowrap overflow-hidden">{subItem.name}</span>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
                             )}
-                            title={isCollapsed ? item.name : undefined}
-                        >
-                            <Icon className="w-5 h-5 flex-shrink-0" />
-                            {!isCollapsed && (
-                                <span className="whitespace-nowrap overflow-hidden">{item.name}</span>
+
+                            {/* Agent Sub-Navigation (Icon Only - Collapsed) */}
+                            {item.name === "Agents" && isCollapsed && isAgentsPage && (
+                                <div className="mt-1 space-y-1 flex flex-col items-center">
+                                    {agentSubNav.map((subItem) => {
+                                        const SubIcon = subItem.icon;
+                                        return (
+                                            <Link
+                                                key={subItem.name}
+                                                href={subItem.href}
+                                                className="p-2 rounded-md text-sidebar-foreground/80 hover:bg-sidebar-accent/30 hover:text-sidebar-accent-foreground transition-all"
+                                                title={subItem.title}
+                                            >
+                                                <SubIcon className="w-4 h-4" />
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
                             )}
-                        </Link>
+                        </div>
                     );
                 })}
             </nav>

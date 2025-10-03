@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Settings, Brain, CreditCard, User, X } from "lucide-react";
+import { Settings, Brain, CreditCard, User, X, Plug } from "lucide-react";
 import { cn } from "@/lib";
+import { IntegrationsModal } from "./integrations-modal";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,9 +18,10 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-type SettingsSection = 'brains' | 'subscription' | 'user';
+type SettingsSection = 'integrations' | 'brains' | 'subscription' | 'user';
 
 const settingsSections = [
+    { id: 'integrations' as const, label: 'Manage Integrations', icon: Plug, description: 'Configure API keys and third-party integrations' },
     { id: 'brains' as const, label: 'Brains', icon: Brain, description: 'Manage your AI brain configurations' },
     { id: 'subscription' as const, label: 'Manage Subscription', icon: CreditCard, description: 'View and manage your subscription plan' },
     { id: 'user' as const, label: 'User Settings', icon: User, description: 'Update your profile and preferences' },
@@ -31,7 +33,8 @@ interface SettingsDropdownProps {
 
 export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdownProps) {
     const [isOpen, setIsOpen] = useState(false);
-    const [activeSection, setActiveSection] = useState<SettingsSection>('brains');
+    const [activeSection, setActiveSection] = useState<SettingsSection>('integrations');
+    const [showIntegrationsModal, setShowIntegrationsModal] = useState(false);
 
     const handleSectionClick = (section: SettingsSection) => {
         setActiveSection(section);
@@ -40,6 +43,35 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
 
     const renderSectionContent = () => {
         switch (activeSection) {
+            case 'integrations':
+                return (
+                    <div className="space-y-4">
+                        <div>
+                            <h3 className="text-lg font-semibold mb-2">Manage Integrations</h3>
+                            <p className="text-sm text-muted-foreground mb-4">
+                                Configure API keys and credentials for third-party services.
+                            </p>
+                        </div>
+                        <div className="flex items-center justify-center py-12">
+                            <button
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    setShowIntegrationsModal(true);
+                                }}
+                                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center gap-2"
+                            >
+                                <Plug className="w-4 h-4" />
+                                Open Integrations Manager
+                            </button>
+                        </div>
+                        <div className="space-y-2 text-sm text-muted-foreground">
+                            <p>✓ Connect 20+ services</p>
+                            <p>✓ Secure API key storage</p>
+                            <p>✓ Test connections</p>
+                            <p>✓ Manage credentials safely</p>
+                        </div>
+                    </div>
+                );
             case 'brains':
                 return (
                     <div className="space-y-4">
@@ -227,6 +259,12 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
                     </div>
                 </DialogContent>
             </Dialog>
+
+            {/* Integrations Modal */}
+            <IntegrationsModal 
+                open={showIntegrationsModal} 
+                onClose={() => setShowIntegrationsModal(false)} 
+            />
         </>
     );
 }
