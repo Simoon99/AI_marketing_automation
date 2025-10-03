@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Settings, Brain, CreditCard, User, X, Plug } from "lucide-react";
+import { Settings, Brain, CreditCard, User, X, Plug, ChevronRight } from "lucide-react";
 import { cn } from "@/lib";
 import { IntegrationsModal } from "./integrations-modal";
 import {
@@ -35,6 +35,7 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
     const [isOpen, setIsOpen] = useState(false);
     const [activeSection, setActiveSection] = useState<SettingsSection>('integrations');
     const [showIntegrationsModal, setShowIntegrationsModal] = useState(false);
+    const [selectedIntegration, setSelectedIntegration] = useState<string | null>(null);
 
     const handleSectionClick = (section: SettingsSection) => {
         setActiveSection(section);
@@ -67,6 +68,68 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
                     { name: 'Trello', emoji: '📋', connected: false },
                 ];
                 
+                if (selectedIntegration) {
+                    // Show integration settings inline
+                    const integration = integrations.find(i => i.name === selectedIntegration);
+                    return (
+                        <div className="space-y-4">
+                            <button 
+                                onClick={() => setSelectedIntegration(null)}
+                                className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4"
+                            >
+                                <ChevronRight className="w-4 h-4 rotate-180" />
+                                Back to all integrations
+                            </button>
+                            
+                            <div className="flex items-center gap-3 mb-6">
+                                <span className="text-4xl">{integration?.emoji}</span>
+                                <div>
+                                    <h3 className="text-2xl font-bold">{integration?.name}</h3>
+                                    <p className="text-sm text-muted-foreground">Configure API credentials</p>
+                                </div>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="text-sm font-medium mb-2 block">API Key</label>
+                                    <input
+                                        type="password"
+                                        placeholder={`Enter your ${integration?.name} API key...`}
+                                        className="w-full px-3 py-2 border rounded-lg bg-background font-mono text-sm"
+                                    />
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        Get your API key from the {integration?.name} dashboard
+                                    </p>
+                                </div>
+                                
+                                <div>
+                                    <label className="text-sm font-medium mb-2 block">API Secret (Optional)</label>
+                                    <input
+                                        type="password"
+                                        placeholder="Enter API secret if required..."
+                                        className="w-full px-3 py-2 border rounded-lg bg-background font-mono text-sm"
+                                    />
+                                </div>
+                                
+                                <div className="flex gap-3 pt-4">
+                                    <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                                        Test Connection
+                                    </button>
+                                    <button className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors">
+                                        Save Credentials
+                                    </button>
+                                </div>
+                                
+                                <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                                    <p className="text-sm text-blue-800 dark:text-blue-300">
+                                        💡 <strong>Security:</strong> Your credentials are encrypted and stored securely. We never share your API keys.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
+                
                 return (
                     <div className="space-y-4">
                         <div>
@@ -80,10 +143,7 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
                             {integrations.map((integration) => (
                                 <button
                                     key={integration.name}
-                                    onClick={() => {
-                                        setIsOpen(false);
-                                        setShowIntegrationsModal(true);
-                                    }}
+                                    onClick={() => setSelectedIntegration(integration.name)}
                                     className="flex flex-col items-center gap-2 p-4 border border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
                                 >
                                     <span className="text-3xl">{integration.emoji}</span>
@@ -316,7 +376,7 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
 
             {/* Settings Modal */}
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogContent className="max-w-5xl h-[85vh] p-0 gap-0 bg-gradient-to-b from-background to-muted/20">
+                <DialogContent className="max-w-6xl h-[90vh] p-0 gap-0 bg-gradient-to-b from-background to-muted/20">
                     <div className="flex h-full">
                         {/* Sidebar */}
                         <div className="w-64 border-r border-border bg-background/50 backdrop-blur-sm">
@@ -353,7 +413,7 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
 
                         {/* Content */}
                         <div className="flex-1 overflow-hidden flex flex-col">
-                            <ScrollArea className="flex-1">
+                            <ScrollArea className="flex-1 h-[calc(90vh-100px)]">
                                 <div className="p-8">
                                     {renderSectionContent()}
                                 </div>

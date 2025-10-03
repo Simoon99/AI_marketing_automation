@@ -336,7 +336,7 @@ export default function ChatTab() {
                             >
                                 <Avatar className={cn(
                                     "w-10 h-10 rounded-lg transition-all duration-300 group-hover:scale-110",
-                                    "shadow-md ring-2 ring-primary/30"
+                                    "shadow-md"
                                 )}>
                                     <AvatarImage src={`/helpers/${activeHelper.id}.png`} alt={activeHelper.name} />
                                     <AvatarFallback className={cn("bg-gradient-to-br text-lg", activeHelper.color)}>
@@ -387,8 +387,8 @@ export default function ChatTab() {
                                                 <Avatar className={cn(
                                                     "w-11 h-11 rounded-lg transition-all duration-300 cursor-pointer",
                                                     isActive 
-                                                        ? "shadow-md ring-2 ring-primary/30" 
-                                                        : "hover:ring-2 hover:ring-primary/20"
+                                                        ? "shadow-md" 
+                                                        : "hover:shadow-md"
                                                 )}>
                                                     <AvatarImage src={`/helpers/${helper.id}.png`} alt={helper.name} />
                                                     <AvatarFallback className={cn(
