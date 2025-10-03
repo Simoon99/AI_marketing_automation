@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import ReactFlow, {
   Node,
   Edge,
@@ -55,7 +55,15 @@ import {
   TestTube,
   GitBranch,
   Filter,
-  RotateCw
+  RotateCw,
+  Merge,
+  Split,
+  Shuffle,
+  Calculator,
+  Globe,
+  Calendar,
+  ShieldAlert,
+  Webhook
 } from 'lucide-react';
 import { cn } from '@/lib';
 import { Badge } from '@/components/ui/badge';
@@ -81,6 +89,22 @@ function CustomNode({ data }: { data: any }) {
         return <Filter className="w-5 h-5 text-white" />;
       case 'loop':
         return <RotateCw className="w-5 h-5 text-white" />;
+      case 'merge':
+        return <Merge className="w-5 h-5 text-white" />;
+      case 'split':
+        return <Split className="w-5 h-5 text-white" />;
+      case 'transform':
+        return <Shuffle className="w-5 h-5 text-white" />;
+      case 'aggregate':
+        return <Calculator className="w-5 h-5 text-white" />;
+      case 'http':
+        return <Globe className="w-5 h-5 text-white" />;
+      case 'schedule':
+        return <Calendar className="w-5 h-5 text-white" />;
+      case 'error':
+        return <ShieldAlert className="w-5 h-5 text-white" />;
+      case 'webhook':
+        return <Webhook className="w-5 h-5 text-white" />;
       default:
         return <Settings className="w-5 h-5 text-white" />;
     }
@@ -104,6 +128,22 @@ function CustomNode({ data }: { data: any }) {
         return 'from-cyan-500 to-cyan-600';
       case 'loop':
         return 'from-indigo-500 to-indigo-600';
+      case 'merge':
+        return 'from-teal-500 to-teal-600';
+      case 'split':
+        return 'from-violet-500 to-violet-600';
+      case 'transform':
+        return 'from-fuchsia-500 to-fuchsia-600';
+      case 'aggregate':
+        return 'from-emerald-500 to-emerald-600';
+      case 'http':
+        return 'from-sky-500 to-sky-600';
+      case 'schedule':
+        return 'from-amber-500 to-amber-600';
+      case 'error':
+        return 'from-red-500 to-red-600';
+      case 'webhook':
+        return 'from-lime-500 to-lime-600';
       default:
         return 'from-gray-500 to-gray-600';
     }
@@ -303,31 +343,30 @@ export function VisualAgentBuilder({
   const [testing, setTesting] = useState(false);
   const [nodePosition, setNodePosition] = useState<{ x: number; y: number } | null>(null);
   const [tipDismissed, setTipDismissed] = useState(false);
+  
+  // Use ref to store current nodes to avoid infinite loop
+  const nodesRef = useRef<Node[]>([]);
+  useEffect(() => {
+    nodesRef.current = nodes;
+  }, [nodes]);
 
   // Handler functions
   const handleNodeSelect = useCallback((nodeId: string) => {
     console.log('Node selected:', nodeId); // Debug log
-    setSelectedNode(nodeId);
     
-    // Mark node as selected, find it, and show panel - all in ONE state update
-    setNodes((nds) => {
-      const node = nds.find(n => n.id === nodeId);
-      if (node) {
-        setEditingNode({ ...node.data }); // Clone the data to avoid reference issues
-        setNodePosition({ x: node.position.x, y: node.position.y });
-        setShowNodePanel(true);
-      }
-      
-      // Return updated nodes with selection state
-      return nds.map((n) => ({
-        ...n,
-        data: {
-          ...n.data,
-          selected: n.id === nodeId,
-        },
-      }));
-    });
-  }, []);
+    // Find the node from current nodes using ref (no dependency on nodes)
+    const node = nodesRef.current.find(n => n.id === nodeId);
+    if (!node) {
+      console.warn('Node not found:', nodeId);
+      return;
+    }
+    
+    // Update all state at once
+    setSelectedNode(nodeId);
+    setEditingNode({ ...node.data }); // Clone the data to avoid reference issues
+    setNodePosition({ x: node.position.x, y: node.position.y });
+    setShowNodePanel(true);
+  }, []); // No dependencies - stable reference
 
   const handleNodeDelete = useCallback((nodeId: string) => {
     if (nodeId === 'trigger') return; // Don't delete trigger
@@ -436,7 +475,7 @@ export function VisualAgentBuilder({
     [setEdges, handleEdgeDelete]
   );
 
-  const addNode = (type: 'fetch' | 'process' | 'action' | 'condition' | 'delay' | 'filter' | 'loop') => {
+  const addNode = (type: 'fetch' | 'process' | 'action' | 'condition' | 'delay' | 'filter' | 'loop' | 'merge' | 'split' | 'transform' | 'aggregate' | 'http' | 'schedule' | 'error' | 'webhook') => {
     const newNodeId = `step-${Date.now()}`;
     const lastNode = nodes[nodes.length - 1];
     const yPosition = lastNode ? lastNode.position.y + 180 : 200;
@@ -676,6 +715,14 @@ export function VisualAgentBuilder({
                   case 'delay': return '#ec4899';
                   case 'filter': return '#06b6d4';
                   case 'loop': return '#6366f1';
+                  case 'merge': return '#14b8a6';
+                  case 'split': return '#8b5cf6';
+                  case 'transform': return '#d946ef';
+                  case 'aggregate': return '#10b981';
+                  case 'http': return '#0ea5e9';
+                  case 'schedule': return '#f59e0b';
+                  case 'error': return '#ef4444';
+                  case 'webhook': return '#84cc16';
                   default: return '#6b7280';
                 }
               }}
@@ -708,7 +755,7 @@ export function VisualAgentBuilder({
                     Add Node
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-64">
+                <DropdownMenuContent align="start" className="w-64 max-h-[500px] overflow-y-auto">
                   <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('fetch'); }} className="gap-3 cursor-pointer">
                     <Database className="w-4 h-4 text-blue-500" />
                     <div>
@@ -721,6 +768,13 @@ export function VisualAgentBuilder({
                     <div>
                       <div className="font-medium">Process Data</div>
                       <div className="text-xs text-muted-foreground">Transform & analyze with AI</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('action'); }} className="gap-3 cursor-pointer">
+                    <Send className="w-4 h-4 text-green-500" />
+                    <div>
+                      <div className="font-medium">Take Action</div>
+                      <div className="text-xs text-muted-foreground">Send & trigger events</div>
                     </div>
                   </DropdownMenuItem>
                   <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('condition'); }} className="gap-3 cursor-pointer">
@@ -751,11 +805,60 @@ export function VisualAgentBuilder({
                       <div className="text-xs text-muted-foreground">Wait before continuing</div>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('action'); }} className="gap-3 cursor-pointer">
-                    <Send className="w-4 h-4 text-green-500" />
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('merge'); }} className="gap-3 cursor-pointer">
+                    <Merge className="w-4 h-4 text-teal-500" />
                     <div>
-                      <div className="font-medium">Take Action</div>
-                      <div className="text-xs text-muted-foreground">Send & trigger events</div>
+                      <div className="font-medium">Merge Data</div>
+                      <div className="text-xs text-muted-foreground">Combine multiple data sources</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('split'); }} className="gap-3 cursor-pointer">
+                    <Split className="w-4 h-4 text-violet-500" />
+                    <div>
+                      <div className="font-medium">Split Data</div>
+                      <div className="text-xs text-muted-foreground">Split data into branches</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('transform'); }} className="gap-3 cursor-pointer">
+                    <Shuffle className="w-4 h-4 text-fuchsia-500" />
+                    <div>
+                      <div className="font-medium">Transform</div>
+                      <div className="text-xs text-muted-foreground">Restructure & map data</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('aggregate'); }} className="gap-3 cursor-pointer">
+                    <Calculator className="w-4 h-4 text-emerald-500" />
+                    <div>
+                      <div className="font-medium">Aggregate</div>
+                      <div className="text-xs text-muted-foreground">Sum, count, or calculate</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('http'); }} className="gap-3 cursor-pointer">
+                    <Globe className="w-4 h-4 text-sky-500" />
+                    <div>
+                      <div className="font-medium">HTTP Request</div>
+                      <div className="text-xs text-muted-foreground">Custom API calls</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('schedule'); }} className="gap-3 cursor-pointer">
+                    <Calendar className="w-4 h-4 text-amber-500" />
+                    <div>
+                      <div className="font-medium">Schedule</div>
+                      <div className="text-xs text-muted-foreground">Time-based triggers</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('error'); }} className="gap-3 cursor-pointer">
+                    <ShieldAlert className="w-4 h-4 text-red-500" />
+                    <div>
+                      <div className="font-medium">Error Handler</div>
+                      <div className="text-xs text-muted-foreground">Catch & handle errors</div>
+                    </div>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('webhook'); }} className="gap-3 cursor-pointer">
+                    <Webhook className="w-4 h-4 text-lime-500" />
+                    <div>
+                      <div className="font-medium">Webhook</div>
+                      <div className="text-xs text-muted-foreground">Receive external data</div>
                     </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
