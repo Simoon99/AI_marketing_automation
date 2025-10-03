@@ -802,31 +802,32 @@ export function VisualAgentBuilder({
       {/* Modal Overlay for Node Customization */}
       <Dialog open={showNodePanel && !!editingNode} onOpenChange={(open) => !open && setShowNodePanel(false)}>
         <DialogContent className="max-w-5xl h-[85vh] p-0 overflow-hidden">
-          <div className="h-full flex flex-col bg-gradient-to-b from-background to-muted/10">
-            {/* Header */}
-            <div className="flex-shrink-0 p-5 border-b border-border bg-background/80 backdrop-blur-sm">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
-                    <Edit className="w-5 h-5 text-primary" />
+          {editingNode && (
+            <div className="h-full flex flex-col bg-gradient-to-b from-background to-muted/10">
+              {/* Header */}
+              <div className="flex-shrink-0 p-5 border-b border-border bg-background/80 backdrop-blur-sm">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center">
+                      <Edit className="w-5 h-5 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg">Customize Node</h3>
+                      <p className="text-xs text-muted-foreground">Configure behavior & integrations</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-lg">Customize Node</h3>
-                    <p className="text-xs text-muted-foreground">Configure behavior & integrations</p>
-                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowNodePanel(false)}
+                    className="hover:bg-destructive/10"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowNodePanel(false)}
-                  className="hover:bg-destructive/10"
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-              <div className="flex items-center gap-2">
-                <Badge variant="outline" className="capitalize font-medium">
-                  {editingNode.type} Node
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="capitalize font-medium">
+                    {editingNode.type} Node
                 </Badge>
                 {editingNode.integration && (
                   <Badge variant="secondary" className="text-xs">
@@ -1320,6 +1321,7 @@ export function VisualAgentBuilder({
               </Button>
             </div>
           </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
