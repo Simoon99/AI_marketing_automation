@@ -15,7 +15,7 @@ const Footer = () => {
                             </span>
                         </div>
                         <p className="text-muted-foreground mt-4 text-sm text-start">
-                            Your AI workforce that never sleeps. Empowering founders to scale billion-dollar companies.
+                            Your AI workforce that never sleeps. Empowering founders to scale lean billion-dollar companies.
                         </p>
                     </div>
                 </Container>
@@ -28,23 +28,23 @@ const Footer = () => {
                             </h3>
                             <ul className="mt-4 text-sm text-muted-foreground space-y-4">
                                 <li className="mt-2">
-                                    <Link href="#" className="link hover:text-foreground transition-all duration-300">
-                                        Features
+                                    <Link href="/features/agents" className="link hover:text-foreground transition-all duration-300">
+                                        AI Agents
                                     </Link>
                                 </li>
                                 <li className="mt-2">
-                                    <Link href="#" className="link hover:text-foreground transition-all duration-300">
+                                    <Link href="/features/helpers" className="link hover:text-foreground transition-all duration-300">
+                                        AI Helpers
+                                    </Link>
+                                </li>
+                                <li className="mt-2">
+                                    <Link href="/features/power-ups" className="link hover:text-foreground transition-all duration-300">
+                                        Power-Ups
+                                    </Link>
+                                </li>
+                                <li className="mt-2">
+                                    <Link href="/pricing" className="link hover:text-foreground transition-all duration-300">
                                         Pricing
-                                    </Link>
-                                </li>
-                                <li className="mt-2">
-                                    <Link href="#" className="link hover:text-foreground transition-all duration-300">
-                                        Testimonials
-                                    </Link>
-                                </li>
-                                <li className="mt-2">
-                                    <Link href="#" className="link hover:text-foreground transition-all duration-300">
-                                        Supported Languages
                                     </Link>
                                 </li>
                             </ul>
@@ -91,12 +91,12 @@ const Footer = () => {
                                     </Link>
                                 </li>
                                 <li className="mt-2">
-                                    <Link href="#" className="link hover:text-foreground transition-all duration-300">
-                                        Translation Guides
+                                    <Link href="/dashboard" className="link hover:text-foreground transition-all duration-300">
+                                        Documentation
                                     </Link>
                                 </li>
                                 <li className="mt-2">
-                                    <Link href="#" className="link hover:text-foreground transition-all duration-300">
+                                    <Link href="/contact" className="link hover:text-foreground transition-all duration-300">
                                         Support
                                     </Link>
                                 </li>
@@ -109,17 +109,22 @@ const Footer = () => {
                                 </h3>
                                 <ul className="mt-4 text-sm text-muted-foreground space-y-4">
                                     <li>
-                                        <Link href="#" className="link hover:text-foreground transition-all duration-300">
+                                        <Link href="/about" className="link hover:text-foreground transition-all duration-300">
                                             About Us
                                         </Link>
                                     </li>
                                     <li className="mt-2">
-                                        <Link href="#" className="link hover:text-foreground transition-all duration-300">
+                                        <Link href="/contact" className="link hover:text-foreground transition-all duration-300">
+                                            Contact
+                                        </Link>
+                                    </li>
+                                    <li className="mt-2">
+                                        <Link href="/privacy" className="link hover:text-foreground transition-all duration-300">
                                             Privacy Policy
                                         </Link>
                                     </li>
                                     <li className="mt-2">
-                                        <Link href="#" className="link hover:text-foreground transition-all duration-300">
+                                        <Link href="/terms" className="link hover:text-foreground transition-all duration-300">
                                             Terms & Conditions
                                         </Link>
                                     </li>
