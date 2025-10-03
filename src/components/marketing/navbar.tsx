@@ -22,7 +22,7 @@ const Navbar = ({ sticky = true }: NavbarProps) => {
                         <Link href="/" className="flex items-center gap-2">
                             <Icons.icon className="w-6" />
                             <span className="text-xl font-semibold hidden lg:block">
-                                Vetra
+                                Celio
                             </span>
                         </Link>
                     </div>

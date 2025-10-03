@@ -16,8 +16,8 @@ interface MetadataProps {
 }
 
 export const generateMetadata = ({
-    title = `Vetra - AI-Powered Project Management & Team Collaboration`,
-    description = `Vetra is an intelligent project management platform that transforms how teams work together. Leverage AI to automate workflows, enhance collaboration, and boost productivity. Experience smarter project management today.`,
+    title = `Celio - AI Employees That Never Sleep`,
+    description = `Celio empowers solo founders and small teams to run billion-dollar companies with AI Agents, Helpers, and Power-Ups. Build, grow, and scale your business with an AI workforce that works 24/7.`,
     icons = [
         {
             rel: "icon",
@@ -32,16 +32,16 @@ export const generateMetadata = ({
     ],
     noIndex = false,
     keywords = [
-        "AI marketing automation",
-        "social media marketing",
-        "content generation",
-        "marketing analytics",
-        "campaign management",
-        "multilingual marketing",
-        "AI copywriting",
-        "marketing workflow",
-        "performance tracking",
-        "digital marketing tools"
+        "AI employees",
+        "AI agents",
+        "AI automation",
+        "business automation",
+        "solo founder tools",
+        "AI helpers",
+        "AI workforce",
+        "productivity tools",
+        "workflow automation",
+        "AI powered business"
     ],
     author = process.env.NEXT_PUBLIC_AUTHOR_NAME,
     type = "website",
