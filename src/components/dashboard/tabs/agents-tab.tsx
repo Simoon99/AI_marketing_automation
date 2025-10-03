@@ -10,10 +10,11 @@ import { agentTemplates, type AgentTemplate, type AgentParameter } from "@/lib/a
 import { IntegrationsModal } from "@/components/dashboard/integrations-modal";
 import { AgentCustomizationModal } from "@/components/dashboard/agent-customization-modal";
 import { ManualAgentModal, type ManualAgentData } from "@/components/dashboard/manual-agent-modal";
-import { Filter } from "lucide-react";
+import { VisualAgentBuilder } from "@/components/dashboard/visual-agent-builder";
+import { Filter, Workflow } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-type ViewMode = 'new-agent' | 'my-agents' | 'configure' | 'details' | 'manual-create';
+type ViewMode = 'new-agent' | 'my-agents' | 'configure' | 'details' | 'manual-create' | 'visual-builder';
 
 const BUSINESS_AREAS = [
     { id: 'all', label: 'All Categories' },
@@ -44,6 +45,9 @@ export default function AgentsTab() {
     const [showManualModal, setShowManualModal] = useState(false);
     const [draftAgentConfig, setDraftAgentConfig] = useState<any>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [visualBuilderConfig, setVisualBuilderConfig] = useState<any>(null);
+    const [visualBuilderName, setVisualBuilderName] = useState<string>('');
+    const [visualBuilderDesc, setVisualBuilderDesc] = useState<string>('');
 
     useEffect(() => {
         loadAgents();
@@ -137,6 +141,48 @@ export default function AgentsTab() {
         } finally {
             setCreating(false);
         }
+    };
+
+    const handleOpenVisualBuilder = (config?: any, name?: string, description?: string) => {
+        setVisualBuilderConfig(config || null);
+        setVisualBuilderName(name || 'New Agent');
+        setVisualBuilderDesc(description || '');
+        setViewMode('visual-builder');
+    };
+
+    const handleSaveFromVisualBuilder = async (config: any) => {
+        setDeploying(true);
+        try {
+            const fullConfig = {
+                ...config,
+                llm: {
+                    model: 'gpt-4-turbo-preview',
+                    temperature: 0.7,
+                },
+            };
+
+            const prompt = `Visual agent: ${config.name}. ${config.description}`;
+            const result = await automationEngine.deployAgent(prompt, fullConfig);
+
+            if (result.success && result.agent) {
+                toast.success(`Agent "${result.agent.name}" created successfully!`);
+                setViewMode('my-agents');
+                await loadAgents();
+            } else {
+                toast.error(result.error || "Failed to create agent");
+            }
+        } catch (error: any) {
+            toast.error(error.message || "Failed to create agent");
+        } finally {
+            setDeploying(false);
+        }
+    };
+
+    const handleCloseVisualBuilder = () => {
+        setViewMode('new-agent');
+        setVisualBuilderConfig(null);
+        setVisualBuilderName('');
+        setVisualBuilderDesc('');
     };
 
     const handleTemplateClick = (template: AgentTemplate) => {
@@ -518,6 +564,21 @@ export default function AgentsTab() {
         );
     }
 
+    // Visual Builder View
+    if (viewMode === 'visual-builder') {
+        return (
+            <div className="h-full">
+                <VisualAgentBuilder
+                    initialConfig={visualBuilderConfig}
+                    onSave={handleSaveFromVisualBuilder}
+                    onClose={handleCloseVisualBuilder}
+                    agentName={visualBuilderName}
+                    agentDescription={visualBuilderDesc}
+                />
+            </div>
+        );
+    }
+
     // Main View - Prompt interface with templates and existing agents
     return (
         <>
@@ -630,14 +691,24 @@ export default function AgentsTab() {
                                         <Sparkles className="w-5 h-5 text-yellow-500" />
                                         Agent Templates (20+)
                                     </h2>
-                                    <Button
-                                        onClick={() => setShowManualModal(true)}
-                                        variant="outline"
-                                        className="gap-2"
-                                    >
-                                        <Settings className="w-4 h-4" />
-                                        Create Manually
-                                    </Button>
+                                    <div className="flex gap-2">
+                                        <Button
+                                            onClick={() => handleOpenVisualBuilder()}
+                                            variant="default"
+                                            className="gap-2"
+                                        >
+                                            <Workflow className="w-4 h-4" />
+                                            Create Visually
+                                        </Button>
+                                        <Button
+                                            onClick={() => setShowManualModal(true)}
+                                            variant="outline"
+                                            className="gap-2"
+                                        >
+                                            <Settings className="w-4 h-4" />
+                                            Create Manually
+                                        </Button>
+                                    </div>
                                 </div>
 
                                 {/* Category Filter */}
@@ -831,6 +902,10 @@ export default function AgentsTab() {
             onSave={handleDeployAgent}
             onCancel={handleCancelCustomization}
             isDeploying={deploying}
+            onViewVisually={(config) => {
+                setShowCustomizationModal(false);
+                handleOpenVisualBuilder(config, config.name, config.description);
+            }}
         />
         <ManualAgentModal
             isOpen={showManualModal}
