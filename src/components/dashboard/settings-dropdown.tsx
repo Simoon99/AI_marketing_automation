@@ -376,11 +376,11 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
 
             {/* Settings Modal */}
             <Dialog open={isOpen} onOpenChange={setIsOpen}>
-                <DialogContent className="max-w-6xl h-[90vh] p-0 gap-0 bg-gradient-to-b from-background to-muted/20">
-                    <div className="flex h-full">
+                <DialogContent className="max-w-6xl max-h-[90vh] p-0 gap-0 bg-gradient-to-b from-background to-muted/20 flex flex-col">
+                    <div className="flex flex-1 overflow-hidden">
                         {/* Sidebar */}
-                        <div className="w-64 border-r border-border bg-background/50 backdrop-blur-sm">
-                            <DialogHeader className="p-6 border-b border-border">
+                        <div className="w-64 border-r border-border bg-background/50 backdrop-blur-sm flex flex-col">
+                            <DialogHeader className="p-6 border-b border-border flex-shrink-0">
                                 <DialogTitle className="flex items-center gap-3 text-xl">
                                     <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
                                         <Settings className="w-5 h-5 text-white" />
@@ -388,32 +388,37 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
                                     Settings
                                 </DialogTitle>
                             </DialogHeader>
-                            <nav className="p-4 space-y-1">
-                                {settingsSections.map((section) => {
-                                    const Icon = section.icon;
-                                    const isActive = activeSection === section.id;
-                                    return (
-                                        <button
-                                            key={section.id}
-                                            onClick={() => setActiveSection(section.id)}
-                                            className={cn(
-                                                "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200",
-                                                isActive
-                                                    ? "bg-primary text-primary-foreground shadow-md"
-                                                    : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
-                                            )}
-                                        >
-                                            <Icon className="w-4 h-4 flex-shrink-0" />
-                                            <span className="text-left">{section.label}</span>
-                                        </button>
-                                    );
-                                })}
-                            </nav>
+                            <ScrollArea className="flex-1">
+                                <nav className="p-4 space-y-1">
+                                    {settingsSections.map((section) => {
+                                        const Icon = section.icon;
+                                        const isActive = activeSection === section.id;
+                                        return (
+                                            <button
+                                                key={section.id}
+                                                onClick={() => {
+                                                    setActiveSection(section.id);
+                                                    setSelectedIntegration(null); // Reset integration selection when changing sections
+                                                }}
+                                                className={cn(
+                                                    "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200",
+                                                    isActive
+                                                        ? "bg-primary text-primary-foreground shadow-md"
+                                                        : "hover:bg-muted/50 text-muted-foreground hover:text-foreground"
+                                                )}
+                                            >
+                                                <Icon className="w-4 h-4 flex-shrink-0" />
+                                                <span className="text-left">{section.label}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </nav>
+                            </ScrollArea>
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 overflow-hidden flex flex-col">
-                            <ScrollArea className="flex-1 h-[calc(90vh-100px)]">
+                        <div className="flex-1 flex flex-col overflow-hidden">
+                            <ScrollArea className="flex-1">
                                 <div className="p-8">
                                     {renderSectionContent()}
                                 </div>

@@ -302,6 +302,7 @@ export function VisualAgentBuilder({
   const [testMode, setTestMode] = useState(false);
   const [testing, setTesting] = useState(false);
   const [nodePosition, setNodePosition] = useState<{ x: number; y: number } | null>(null);
+  const [tipDismissed, setTipDismissed] = useState(false);
 
   // Handler functions
   const handleNodeSelect = useCallback((nodeId: string) => {
@@ -680,11 +681,18 @@ export function VisualAgentBuilder({
             />
 
             {/* Helper Tip - Shows when there are few nodes */}
-            {nodes.length <= 2 && (
+            {nodes.length <= 2 && !tipDismissed && (
               <Panel position="top-center">
-                <div className="bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-500">
-                  <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                  Drag from the blue circles on nodes to connect them together
+                <div className="bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-500">
+                  <div className="w-2 h-2 bg-white rounded-full animate-pulse flex-shrink-0" />
+                  <span>Drag from the blue circles on nodes to connect them together</span>
+                  <button
+                    onClick={() => setTipDismissed(true)}
+                    className="ml-2 hover:bg-white/20 rounded p-0.5 transition-colors flex-shrink-0"
+                    title="Dismiss tip"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </Panel>
             )}
@@ -699,49 +707,49 @@ export function VisualAgentBuilder({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-64">
-                  <DropdownMenuItem onClick={() => addNode('fetch')} className="gap-3 cursor-pointer">
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('fetch'); }} className="gap-3 cursor-pointer">
                     <Database className="w-4 h-4 text-blue-500" />
                     <div>
                       <div className="font-medium">Fetch Data</div>
                       <div className="text-xs text-muted-foreground">Get data from APIs & services</div>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => addNode('process')} className="gap-3 cursor-pointer">
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('process'); }} className="gap-3 cursor-pointer">
                     <Brain className="w-4 h-4 text-orange-500" />
                     <div>
                       <div className="font-medium">Process Data</div>
                       <div className="text-xs text-muted-foreground">Transform & analyze with AI</div>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => addNode('condition')} className="gap-3 cursor-pointer">
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('condition'); }} className="gap-3 cursor-pointer">
                     <GitBranch className="w-4 h-4 text-yellow-500" />
                     <div>
                       <div className="font-medium">Condition</div>
                       <div className="text-xs text-muted-foreground">Branch based on logic</div>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => addNode('filter')} className="gap-3 cursor-pointer">
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('filter'); }} className="gap-3 cursor-pointer">
                     <Filter className="w-4 h-4 text-cyan-500" />
                     <div>
                       <div className="font-medium">Filter Data</div>
                       <div className="text-xs text-muted-foreground">Filter & validate data</div>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => addNode('loop')} className="gap-3 cursor-pointer">
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('loop'); }} className="gap-3 cursor-pointer">
                     <RotateCw className="w-4 h-4 text-indigo-500" />
                     <div>
                       <div className="font-medium">Loop</div>
                       <div className="text-xs text-muted-foreground">Repeat actions for each item</div>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => addNode('delay')} className="gap-3 cursor-pointer">
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('delay'); }} className="gap-3 cursor-pointer">
                     <Clock className="w-4 h-4 text-pink-500" />
                     <div>
                       <div className="font-medium">Delay</div>
                       <div className="text-xs text-muted-foreground">Wait before continuing</div>
                     </div>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => addNode('action')} className="gap-3 cursor-pointer">
+                  <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('action'); }} className="gap-3 cursor-pointer">
                     <Send className="w-4 h-4 text-green-500" />
                     <div>
                       <div className="font-medium">Take Action</div>
