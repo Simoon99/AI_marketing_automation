@@ -188,18 +188,18 @@ export default function AgentsTab() {
                 },
             };
 
-            const prompt = `Visual agent: ${config.name}. ${config.description}`;
-            const result = await automationEngine.deployAgent(prompt, fullConfig);
+            // Save directly to database without edge function
+            const result = await automationEngine.saveAgent(fullConfig);
 
             if (result.success && result.agent) {
-                toast.success(`Agent "${result.agent.name}" created successfully!`);
+                toast.success(`Agent "${result.agent.name}" saved successfully!`);
                 setViewMode('my-agents');
                 await loadAgents();
             } else {
-                toast.error(result.error || "Failed to create agent");
+                toast.error(result.error || "Failed to save agent");
             }
         } catch (error: any) {
-            toast.error(error.message || "Failed to create agent");
+            toast.error(error.message || "Failed to save agent");
         } finally {
             setDeploying(false);
         }

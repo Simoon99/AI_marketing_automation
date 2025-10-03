@@ -144,6 +144,59 @@ export class AutomationEngine {
   }
 
   /**
+   * Save agent directly to database (no edge function)
+   */
+  async saveAgent(config: any): Promise<CreateAgentResponse> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        return {
+          success: false,
+          error: 'User not authenticated',
+        };
+      }
+
+      const agentData = {
+        user_id: user.id,
+        name: config.name || 'Untitled Agent',
+        description: config.description || '',
+        prompt: `Visual agent: ${config.name}`,
+        config: config,
+        trigger_type: config.trigger_type || 'manual',
+        schedule: config.schedule || null,
+        integrations: config.integrations || [],
+        status: 'active',
+      };
+
+      const { data, error } = await supabase
+        .from('agents')
+        .insert([agentData])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Failed to save agent:', error);
+        return {
+          success: false,
+          error: error.message || 'Failed to save agent',
+        };
+      }
+
+      return {
+        success: true,
+        agent: data,
+      };
+    } catch (error: any) {
+      console.error('Error saving agent:', error);
+      return {
+        success: false,
+        error: error.message || 'Unexpected error',
+      };
+    }
+  }
+
+  /**
    * Execute an agent
    */
   async executeAgent(

@@ -351,23 +351,17 @@ export function VisualAgentBuilder({
 
   // Handler functions - stable callbacks
   const handleNodeSelect = useCallback((nodeId: string) => {
-    console.log('Node selected:', nodeId); // Debug log
-    
-    // Use ref to access current nodes without triggering updates
     const node = nodesRef.current.find(n => n.id === nodeId);
     if (node) {
-      console.log('Found node:', node.id, 'Type:', node.data.type);
       setSelectedNode(nodeId);
-      setEditingNode({ ...node.data }); // Clone the data to avoid reference issues
+      setEditingNode({ ...node.data });
       setNodePosition({ x: node.position.x, y: node.position.y });
       setShowNodePanel(true);
-    } else {
-      console.warn('Node not found:', nodeId);
     }
   }, []);
 
   const handleNodeDelete = useCallback((nodeId: string) => {
-    if (nodeId === 'trigger') return; // Don't delete trigger
+    if (nodeId === 'trigger') return;
     setNodes((nds) => nds.filter((n) => n.id !== nodeId));
     setEdges((eds) => eds.filter((e) => e.source !== nodeId && e.target !== nodeId));
     if (selectedNode === nodeId) {
@@ -456,7 +450,7 @@ export function VisualAgentBuilder({
         },
       }]);
     }
-  }, [initialConfig, handleNodeSelect, handleNodeDelete]);
+  }, [initialConfig]); // Only depend on initialConfig, not the handlers
 
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge({ 
@@ -753,7 +747,7 @@ export function VisualAgentBuilder({
                     Add Node
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="w-64 max-h-[500px] overflow-y-auto">
+                <DropdownMenuContent align="start" className="w-64 max-h-[360px] overflow-y-auto">
                   <DropdownMenuItem onSelect={(e) => { e.preventDefault(); addNode('fetch'); }} className="gap-3 cursor-pointer">
                     <Database className="w-4 h-4 text-blue-500" />
                     <div>
