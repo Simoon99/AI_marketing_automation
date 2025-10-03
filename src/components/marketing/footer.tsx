@@ -4,142 +4,81 @@ import Icons from "../global/icons";
 
 const Footer = () => {
     return (
-        <footer className="flex flex-col relative items-center justify-center border-t border-foreground/5 pt-16 pb-8 px-6 lg:px-8 w-full max-w-6xl mx-auto lg:pt-32">
-            <div className="grid gap-8 xl:grid-cols-3 xl:gap-8 w-full">
-                <Container>
-                    <div className="flex flex-col items-start justify-start md:max-w-[200px]">
-                        <div className="flex items-center gap-2">
+        <footer className="flex flex-col relative items-center justify-center border-t border-border/50 pt-12 pb-8 px-6 lg:px-8 w-full max-w-7xl mx-auto">
+            {/* Single Combined Section */}
+            <Container className="w-full mb-8">
+                <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start justify-between">
+                    {/* Brand */}
+                    <div className="flex flex-col items-start max-w-xs">
+                        <div className="flex items-center gap-2 mb-3">
                             <Icons.icon className="w-auto h-5" />
-                            <span className="text-base md:text-lg font-medium text-foreground">
+                            <span className="text-lg font-semibold text-foreground">
                                 Celio
                             </span>
                         </div>
-                        <p className="text-muted-foreground mt-4 text-sm text-start">
+                        <p className="text-xs text-muted-foreground leading-relaxed mb-4">
                             Your AI workforce that never sleeps. Empowering founders to scale lean billion-dollar companies.
                         </p>
+                        <p className="text-xs text-muted-foreground">
+                            Copyright © {new Date().getFullYear()} Celio, Inc.<br />
+                            All rights reserved
+                        </p>
                     </div>
-                </Container>
 
-                <div className="grid-cols-2 gap-8 grid mt-16 xl:col-span-2 xl:mt-0">
-                    <div className="md:grid md:grid-cols-2 md:gap-8">
-                        <Container delay={0.1} className="h-auto">
-                            <h3 className="text-base font-medium text-foreground">
-                                Product
-                            </h3>
-                            <ul className="mt-4 text-sm text-muted-foreground space-y-4">
-                                <li className="mt-2">
-                                    <Link href="/features/agents" className="link hover:text-foreground transition-all duration-300">
-                                        AI Agents
-                                    </Link>
-                                </li>
-                                <li className="mt-2">
-                                    <Link href="/features/helpers" className="link hover:text-foreground transition-all duration-300">
-                                        AI Helpers
-                                    </Link>
-                                </li>
-                                <li className="mt-2">
-                                    <Link href="/features/power-ups" className="link hover:text-foreground transition-all duration-300">
-                                        Power-Ups
-                                    </Link>
-                                </li>
-                                <li className="mt-2">
-                                    <Link href="/pricing" className="link hover:text-foreground transition-all duration-300">
-                                        Pricing
-                                    </Link>
-                                </li>
-                            </ul>
-                        </Container>
-                        <Container delay={0.2} className="h-auto">
-                            <div className="mt-10 md:mt-0 flex flex-col">
-                                <h3 className="text-base font-medium text-foreground">
-                                    Solutions
-                                </h3>
-                                <ul className="mt-4 text-sm text-muted-foreground space-y-4">
-                                    <li>
-                                        <Link href="#" className="link hover:text-foreground transition-all duration-300">
-                                            Content Creators
-                                        </Link>
-                                    </li>
-                                    <li className="mt-2">
-                                        <Link href="#" className="link hover:text-foreground transition-all duration-300">
-                                            Businesses
-                                        </Link>
-                                    </li>
-                                    <li className="mt-2">
-                                        <Link href="#" className="link hover:text-foreground transition-all duration-300">
-                                            Education
-                                        </Link>
-                                    </li>
-                                    <li className="mt-2">
-                                        <Link href="#" className="link hover:text-foreground transition-all duration-300">
-                                            Enterprise
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                        </Container>
+                    {/* All Links Combined */}
+                    <div className="flex flex-wrap gap-x-8 gap-y-3 text-sm text-muted-foreground max-w-4xl">
+                        <Link href="/features/helpers" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Celio Helpers
+                        </Link>
+                        <Link href="/features/agents" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            AI Agents
+                        </Link>
+                        <Link href="/features/power-ups" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Power-ups
+                        </Link>
+                        <Link href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Blog
+                        </Link>
+                        <Link href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Case studies
+                        </Link>
+                        <Link href="/dashboard" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Support
+                        </Link>
+                        <Link href="/dashboard" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Help center
+                        </Link>
+                        <a href="mailto:hello@celio.ai" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Contact
+                        </a>
+                        <Link href="/pricing" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Plans and Payments
+                        </Link>
+                        <Link href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            FAQ
+                        </Link>
+                        <Link href="/about" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            About Us
+                        </Link>
+                        <Link href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Become an Affiliate
+                        </Link>
+                        <Link href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Careers
+                        </Link>
+                        <Link href="/privacy" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Privacy policy
+                        </Link>
+                        <Link href="/terms" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Terms and conditions
+                        </Link>
+                        <Link href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Refund policy
+                        </Link>
+                        <Link href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
+                            Money-Back Guarantee
+                        </Link>
                     </div>
-                    <div className="md:grid md:grid-cols-2 md:gap-8">
-                        <Container delay={0.3} className="h-auto">
-                            <h3 className="text-base font-medium text-foreground">
-                                Resources
-                            </h3>
-                            <ul className="mt-4 text-sm text-muted-foreground space-y-4">
-                                <li className="mt-2">
-                                    <Link href="#" className="link hover:text-foreground transition-all duration-300">
-                                        Blog
-                                    </Link>
-                                </li>
-                                <li className="mt-2">
-                                    <Link href="/dashboard" className="link hover:text-foreground transition-all duration-300">
-                                        Documentation
-                                    </Link>
-                                </li>
-                                <li className="mt-2">
-                                    <Link href="/contact" className="link hover:text-foreground transition-all duration-300">
-                                        Support
-                                    </Link>
-                                </li>
-                            </ul>
-                        </Container>
-                        <Container delay={0.4} className="h-auto">
-                            <div className="mt-10 md:mt-0 flex flex-col">
-                                <h3 className="text-base font-medium text-foreground">
-                                    Company
-                                </h3>
-                                <ul className="mt-4 text-sm text-muted-foreground space-y-4">
-                                    <li>
-                                        <Link href="/about" className="link hover:text-foreground transition-all duration-300">
-                                            About Us
-                                        </Link>
-                                    </li>
-                                    <li className="mt-2">
-                                        <Link href="/contact" className="link hover:text-foreground transition-all duration-300">
-                                            Contact
-                                        </Link>
-                                    </li>
-                                    <li className="mt-2">
-                                        <Link href="/privacy" className="link hover:text-foreground transition-all duration-300">
-                                            Privacy Policy
-                                        </Link>
-                                    </li>
-                                    <li className="mt-2">
-                                        <Link href="/terms" className="link hover:text-foreground transition-all duration-300">
-                                            Terms & Conditions
-                                        </Link>
-                                    </li>
-                                </ul>
-                            </div>
-                        </Container>
-                    </div>
-                </div>
-            </div>
-
-            <Container delay={0.5} className="w-full relative mt-12 lg:mt-20">
-                <div className="mt-8 md:flex md:items-center justify-center footer w-full">
-                    <p className="text-sm text-muted-foreground mt-8 md:mt-0">
-                        &copy; {new Date().getFullYear()} Celio. All rights reserved.
-                    </p>
                 </div>
             </Container>
         </footer>

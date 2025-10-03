@@ -59,11 +59,6 @@ export default function HelpersPage() {
             {/* Hero Section */}
             <Container>
                 <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 mb-6">
-                        <Users className="w-4 h-4 text-blue-500" />
-                        <span className="text-sm font-medium text-blue-500">AI Helpers</span>
-                    </div>
-                    
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold !leading-tight mb-6">
                         Your Personal Team of <br />
                         <span className="bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
@@ -77,13 +72,13 @@ export default function HelpersPage() {
                     
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Link href="/pricing">
-                            <Button variant="blue" size="lg" className="gap-2">
+                            <Button variant="blue" size="lg" className="gap-2 rounded-full">
                                 Meet Your Team
                                 <ArrowRight className="w-4 h-4" />
                             </Button>
                         </Link>
                         <Link href="/dashboard">
-                            <Button variant="outline" size="lg">
+                            <Button variant="outline" size="lg" className="rounded-full">
                                 Try Helpers
                             </Button>
                         </Link>
@@ -154,7 +149,7 @@ export default function HelpersPage() {
                         Get instant access to 12 specialized AI helpers and transform how you work.
                     </p>
                     <Link href="/pricing">
-                        <Button variant="secondary" size="lg" className="gap-2">
+                        <Button variant="secondary" size="lg" className="gap-2 rounded-full">
                             Get Started Now
                             <ArrowRight className="w-4 h-4" />
                         </Button>

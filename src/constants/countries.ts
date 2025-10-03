@@ -15,9 +15,9 @@ export const SUPPORTED_LANGUAGES = [
         code: "fr"
     },
     {
-        name: "Russian",
-        flag: "🇷🇺",
-        code: "ru"
+        name: "Lithuanian",
+        flag: "🇱🇹",
+        code: "lt"
     },
     {
         name: "German",

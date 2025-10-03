@@ -44,10 +44,10 @@ const CTA = () => {
                         Ready to build your <br /> <span className="font-subheading italic">AI workforce</span>?
                     </h2>
                     <p className="text-sm md:text-lg text-center text-accent-foreground/80 max-w-2xl mx-auto mt-4">
-                        Join the founders who are scaling billion-dollar operations with teams of AI Agents <span className="hidden lg:inline">and Helpers that never take a break.</span>
+                        Join the founders who are scaling lean billion-dollar operations with teams of AI Agents <span className="hidden lg:inline">and Helpers that never take a break.</span>
                     </p>
                     <Link href="/pricing" className="mt-8">
-                        <Button size="lg" className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600">
+                        <Button size="lg" className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 rounded-full">
                             Get Celio
                         </Button>
                     </Link>

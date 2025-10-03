@@ -43,11 +43,6 @@ export default function AgentsPage() {
             {/* Hero Section */}
             <Container>
                 <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-500/10 border border-violet-500/20 mb-6">
-                        <Sparkles className="w-4 h-4 text-violet-500" />
-                        <span className="text-sm font-medium text-violet-500">AI Agents</span>
-                    </div>
-                    
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold !leading-tight mb-6">
                         Automate Everything with <br />
                         <span className="bg-gradient-to-r from-violet-500 to-purple-500 bg-clip-text text-transparent">
@@ -61,13 +56,13 @@ export default function AgentsPage() {
                     
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Link href="/pricing">
-                            <Button variant="blue" size="lg" className="gap-2">
+                            <Button variant="blue" size="lg" className="gap-2 rounded-full">
                                 Start Building
                                 <ArrowRight className="w-4 h-4" />
                             </Button>
                         </Link>
                         <Link href="/dashboard">
-                            <Button variant="outline" size="lg">
+                            <Button variant="outline" size="lg" className="rounded-full">
                                 Try Demo
                             </Button>
                         </Link>
@@ -135,7 +130,7 @@ export default function AgentsPage() {
                         Join thousands of teams using AI Agents to save time and scale their operations.
                     </p>
                     <Link href="/pricing">
-                        <Button variant="secondary" size="lg" className="gap-2">
+                        <Button variant="secondary" size="lg" className="gap-2 rounded-full">
                             Get Started Now
                             <ArrowRight className="w-4 h-4" />
                         </Button>

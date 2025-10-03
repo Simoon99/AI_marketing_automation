@@ -41,10 +41,16 @@ export default function AboutPage() {
             {/* Hero Section */}
             <Container>
                 <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-                        <Heart className="w-4 h-4 text-primary" />
-                        <span className="text-sm font-medium text-primary">About Celio</span>
-                    </div>
+                    <button className="group relative grid overflow-hidden rounded-full px-2 py-1 shadow-[0_1000px_0_0_hsl(0_0%_15%)_inset] transition-colors duration-200 mx-auto mb-6">
+                        <span>
+                            <span className="spark mask-gradient absolute inset-0 h-[100%] w-[100%] animate-flip overflow-hidden rounded-full [mask:linear-gradient(white,_transparent_50%)] before:absolute before:aspect-square before:w-[200%] before:rotate-[-90deg] before:animate-rotate before:bg-[conic-gradient(from_0deg,transparent_0_340deg,white_360deg)] before:content-[''] before:[inset:0_auto_auto_50%] before:[translate:-50%_-15%]" />
+                        </span>
+                        <span className="backdrop absolute inset-[1px] rounded-full bg-background transition-colors duration-200 group-hover:bg-neutral-800" />
+                        <span className="z-10 py-0.5 text-sm text-neutral-100 flex items-center gap-1.5">
+                            <Heart className="w-3.5 h-3.5" />
+                            About Celio
+                        </span>
+                    </button>
                     
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold !leading-tight mb-6">
                         Empowering Small Teams to Build <br />
@@ -90,14 +96,14 @@ export default function AboutPage() {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
                     {VALUES.map((value, index) => (
-                        <MagicCard
+                         <MagicCard
                             key={index}
-                            gradientFrom="#3b82f6"
+                            gradientFrom="#6366f1"
                             gradientTo="#8b5cf6"
-                            gradientColor="rgba(59,130,246,0.1)"
+                            gradientColor="rgba(99,102,241,0.1)"
                             className="p-6 rounded-2xl"
                         >
-                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center mb-4">
+                            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center mb-4">
                                 <value.icon className="w-6 h-6 text-white" />
                             </div>
                             <h3 className="font-semibold text-lg mb-2">{value.title}</h3>
@@ -147,25 +153,25 @@ export default function AboutPage() {
 
             {/* CTA Section */}
             <Container className="mt-16">
-                <div className="bg-gradient-to-br from-primary to-primary/60 rounded-3xl p-8 md:p-12 text-center text-white">
+                <div className="bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-3xl p-8 md:p-12 text-center text-white">
                     <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">
                         Ready to Join the Revolution?
                     </h2>
                     <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-                        Start building your AI-powered business today. No credit card required.
+                        Start building your AI-powered business today. You deserve to win back time.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link href="/pricing">
-                            <Button variant="secondary" size="lg" className="gap-2">
+                            <Button variant="secondary" size="lg" className="gap-2 rounded-full">
                                 Get Started
                                 <ArrowRight className="w-4 h-4" />
                             </Button>
                         </Link>
-                        <Link href="/contact">
-                            <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                        <a href="mailto:hello@celio.ai">
+                            <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-full">
                                 Contact Us
                             </Button>
-                        </Link>
+                        </a>
                     </div>
                 </div>
             </Container>

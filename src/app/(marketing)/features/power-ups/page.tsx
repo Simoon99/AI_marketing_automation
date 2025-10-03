@@ -62,11 +62,6 @@ export default function PowerUpsPage() {
             {/* Hero Section */}
             <Container>
                 <div className="flex flex-col items-center text-center max-w-4xl mx-auto mb-16">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-500/10 border border-orange-500/20 mb-6">
-                        <Zap className="w-4 h-4 text-orange-500" />
-                        <span className="text-sm font-medium text-orange-500">Power-Ups</span>
-                    </div>
-                    
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold !leading-tight mb-6">
                         Supercharge Your <br />
                         <span className="bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
@@ -80,13 +75,13 @@ export default function PowerUpsPage() {
                     
                     <div className="flex flex-col sm:flex-row gap-4">
                         <Link href="/pricing">
-                            <Button variant="blue" size="lg" className="gap-2">
+                            <Button variant="blue" size="lg" className="gap-2 rounded-full">
                                 Explore Power-Ups
                                 <ArrowRight className="w-4 h-4" />
                             </Button>
                         </Link>
                         <Link href="/dashboard">
-                            <Button variant="outline" size="lg">
+                            <Button variant="outline" size="lg" className="rounded-full">
                                 Try Demo
                             </Button>
                         </Link>
@@ -128,7 +123,7 @@ export default function PowerUpsPage() {
                         + 44 more power-ups for every business need
                     </p>
                     <Link href="/dashboard">
-                        <Button variant="outline">
+                        <Button variant="outline" className="rounded-full">
                             View All Power-Ups
                         </Button>
                     </Link>
@@ -174,7 +169,7 @@ export default function PowerUpsPage() {
                         Get instant access to 50+ AI-powered power-ups and transform how you create.
                     </p>
                     <Link href="/pricing">
-                        <Button variant="secondary" size="lg" className="gap-2">
+                        <Button variant="secondary" size="lg" className="gap-2 rounded-full">
                             Get Started Now
                             <ArrowRight className="w-4 h-4" />
                         </Button>
