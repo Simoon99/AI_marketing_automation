@@ -41,14 +41,14 @@ const CTA = () => {
                         }}
                     />
                     <h2 className="text-3xl md:text-5xl lg:text-6xl font-heading font-medium !leading-snug">
-                        Ready to boost your <br /> <span className="font-subheading italic">marketing</span> ?
+                        Ready to build your <br /> <span className="font-subheading italic">AI workforce</span>?
                     </h2>
                     <p className="text-sm md:text-lg text-center text-accent-foreground/80 max-w-2xl mx-auto mt-4">
-                        Transform your marketing with AI-powered automation. Create campaigns faster, generate better content <span className="hidden lg:inline">and make smarter decisions in minutes.</span>
+                        Join the founders who are scaling billion-dollar operations with teams of AI Agents <span className="hidden lg:inline">and Helpers that never take a break.</span>
                     </p>
-                    <Link href="/dashboard" className="mt-8">
-                        <Button size="lg">
-                            Let&apos;s get started
+                    <Link href="/pricing" className="mt-8">
+                        <Button size="lg" className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600">
+                            Get Celio
                         </Button>
                     </Link>
                 </div>

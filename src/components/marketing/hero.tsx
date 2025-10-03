@@ -8,7 +8,7 @@ import { OrbitingCircles } from "../ui/orbiting-circles";
 
 const Hero = () => {
     return (
-        <div className="relative flex flex-col items-center justify-center w-full py-20">
+        <div className="relative flex flex-col items-center justify-center w-full py-12 lg:py-16">
 
             <div className="absolute flex lg:hidden size-40 rounded-full bg-blue-500 blur-[10rem] top-0 left-1/2 -translate-x-1/2 -z-10"></div>
 
@@ -56,25 +56,24 @@ const Hero = () => {
                         </button>
                     </Container>
                     <Container delay={0.15}>
-                        <h1 className="text-4xl md:text-4xl lg:text-7xl font-bold text-center !leading-tight max-w-4xl mx-auto">
-                            Transform your {" "}
-                            <span className="">
-                                marketing {" "}
-                            </span>
-                            with AI Precision
+                        <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold text-center !leading-tight max-w-5xl mx-auto">
+                            AI Employees: Your Helpers That Never Sleep
                         </h1>
                     </Container>
                     <Container delay={0.2}>
-                        <p className="max-w-xl mx-auto mt-2 text-base lg:text-lg text-center text-muted-foreground">
-                            AI-powered automation and insights to maximize your campaigns and grow your brand.
+                        <p className="max-w-2xl mx-auto mt-4 text-base lg:text-xl text-center text-muted-foreground font-medium">
+                            Build, grow, and scale your business with a team of AI Agents, Helpers, and Power-Ups.
+                            <span className="block mt-2">
+                                Empowering solo founders and small teams to run billion-dollar companies.
+                            </span>
                         </p>
                     </Container>
                     <Container delay={0.25} className="z-20">
-                        <div className="flex items-center justify-center mt-6 gap-x-4">
-                            <Link href="/dashboard" className="flex items-center gap-2 group">
-                                <Button size="lg">
-                                    Start Free Trial
-                                    <ArrowRightIcon className="size-4 group-hover:translate-x-1 transition-all duration-300" />
+                        <div className="flex items-center justify-center mt-8">
+                            <Link href="/pricing" className="flex items-center gap-2 group">
+                                <Button size="lg" className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white shadow-lg px-8 py-6 text-lg rounded-xl">
+                                    Get Celio
+                                    <ArrowRightIcon className="size-5 group-hover:translate-x-1 transition-all duration-300" />
                                 </Button>
                             </Link>
                         </div>

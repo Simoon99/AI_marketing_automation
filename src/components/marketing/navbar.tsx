@@ -40,7 +40,12 @@ const Navbar = ({ sticky = true }: NavbarProps) => {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Link href="#" className="hidden lg:block">
+                        <Link href="/dashboard" className="hidden lg:block">
+                            <Button variant="ghost" className="text-sm font-medium">
+                                Log in
+                            </Button>
+                        </Link>
+                        <Link href="/pricing" className="hidden lg:block">
                             <Button variant="blue">
                                 Get Started
                             </Button>
