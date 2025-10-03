@@ -14,7 +14,7 @@ import { VisualAgentBuilder } from "@/components/dashboard/visual-agent-builder"
 import { Filter, Workflow } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
-type ViewMode = 'new-agent' | 'my-agents' | 'configure' | 'details' | 'manual-create' | 'visual-builder';
+type ViewMode = 'new-agent' | 'my-agents' | 'configure' | 'details' | 'visual-builder';
 
 const BUSINESS_AREAS = [
     { id: 'all', label: 'All Categories' },
@@ -74,13 +74,16 @@ export default function AgentsTab() {
         }
 
         setCreating(true);
-        // Call OpenAI to generate config (without creating in DB yet)
+        // Call OpenAI to generate config and open visual builder
         const result = await automationEngine.generateAgentConfig(prompt);
 
         if (result.success && result.config) {
-            toast.success("Agent configuration generated! Review and customize it before deploying.");
-            setDraftAgentConfig({ ...result.config, originalPrompt: prompt });
-            setShowCustomizationModal(true);
+            toast.success("Opening visual builder with your agent...");
+            handleOpenVisualBuilder(
+                result.config, 
+                result.config.name || 'AI Generated Agent',
+                prompt
+            );
             setPrompt("");
         } else {
             toast.error(result.error || "Failed to generate agent configuration");
@@ -186,15 +189,35 @@ export default function AgentsTab() {
     };
 
     const handleTemplateClick = (template: AgentTemplate) => {
-        // Initialize parameters with default values
-        const initialParams: Record<string, string> = {};
-        template.parameters.forEach(param => {
-            initialParams[param.id] = param.defaultValue || '';
-        });
+        // Convert template to visual builder config
+        const templateConfig = {
+            name: template.name,
+            description: template.description,
+            trigger_type: 'manual',
+            steps: [
+                {
+                    type: 'fetch',
+                    action: 'get_data',
+                    integration: 'gmail',
+                    params: {},
+                },
+                {
+                    type: 'process',
+                    action: 'analyze_with_ai',
+                    integration: 'openai',
+                    params: {},
+                },
+                {
+                    type: 'action',
+                    action: 'send_notification',
+                    integration: 'slack',
+                    params: {},
+                }
+            ],
+            integrations: ['gmail', 'openai', 'slack'],
+        };
         
-        setSelectedTemplate(template);
-        setTemplateParams(initialParams);
-        setViewMode('configure');
+        handleOpenVisualBuilder(templateConfig, template.name, template.description);
     };
 
     const handleParameterChange = (paramId: string, value: string) => {
@@ -590,11 +613,11 @@ export default function AgentsTab() {
                         {/* View Tabs */}
                         <div className="flex gap-2">
                             <Button 
-                                variant={viewMode === 'new-agent' ? 'default' : 'ghost'}
+                                variant={viewMode === 'new-agent' || viewMode === 'visual-builder' ? 'default' : 'ghost'}
                                 onClick={() => setViewMode('new-agent')}
                                 className="gap-2"
                             >
-                                <Plus className="w-4 h-4" />
+                                <Workflow className="w-4 h-4" />
                                 New Agent
                             </Button>
                             <Button 
@@ -610,7 +633,7 @@ export default function AgentsTab() {
                                     </span>
                                 )}
                             </Button>
-                    </div>
+                        </div>
 
                         {/* Integrations Button */}
                         <Button
@@ -624,24 +647,26 @@ export default function AgentsTab() {
                     </div>
                 </div>
 
-                {/* Content based on view mode */}
+                {/* New Agent View - Prompt to Visual Builder */}
                 {viewMode === 'new-agent' && (
                 <>
-                    {/* Hero Section */}
+                    {/* Hero Section with Prompt Input */}
                     <div className="flex-shrink-0 px-6 pt-6 pb-8">
-                        <div className="max-w-4xl mx-auto text-center">
-                            <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                                What should we build today?
-                            </h1>
-                            <p className="text-lg text-muted-foreground mb-8">
-                                Create intelligent agents by chatting with AI.
-                            </p>
+                        <div className="max-w-4xl mx-auto">
+                            <div className="text-center mb-8">
+                                <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                                    What should we build today?
+                                </h1>
+                                <p className="text-lg text-muted-foreground">
+                                    Describe your agent and we'll build it visually together
+                                </p>
+                            </div>
 
                             {/* Prompt Input */}
                             <div className="relative max-w-3xl mx-auto">
                                 <textarea
-                                    className="w-full min-h-[160px] px-6 py-4 bg-card border-2 border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-base transition-all placeholder:text-muted-foreground/60"
-                                    placeholder="Type your idea and we'll build it together.&#10;&#10;Example: Create an agent that monitors my Gmail inbox every morning at 8 AM, summarizes unread emails by category, and sends me a summary."
+                                    className="w-full min-h-[160px] px-6 py-4 bg-card border-2 border-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none text-base transition-all placeholder:text-muted-foreground/60"
+                                    placeholder="Example: Create an agent that monitors my Gmail inbox every morning at 8 AM, summarizes unread emails by category, and sends me a Slack notification with the summary.&#10;&#10;The more detail you provide, the better your agent will be!"
                                     value={prompt}
                                     onChange={(e) => setPrompt(e.target.value)}
                                     disabled={creating}
@@ -653,30 +678,27 @@ export default function AgentsTab() {
                                 />
                                 <div className="absolute bottom-4 right-4 flex items-center gap-2">
                                     <Button 
-                                        size="sm" 
-                                        variant="ghost"
-                                        className="h-8 text-xs"
-                                        disabled={creating}
-                                    >
-                                        <Plus className="w-3 h-3 mr-1" />
-                                        Attach
-                                    </Button>
-                                    <Button 
                                         onClick={handleCreateAgent}
                                         disabled={creating || !prompt.trim()}
-                                        className="h-10 px-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white"
+                                        className="h-10 px-6 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
                                     >
                                         {creating ? (
-                                            <Loader2 className="w-4 h-4 animate-spin" />
+                                            <>
+                                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                                Building...
+                                            </>
                                         ) : (
-                                            <ArrowUp className="w-4 h-4" />
+                                            <>
+                                                <Workflow className="w-4 h-4 mr-2" />
+                                                Build Agent
+                                            </>
                                         )}
                                     </Button>
-                </div>
-            </div>
+                                </div>
+                            </div>
 
-                            <p className="text-xs text-muted-foreground mt-3">
-                                Press <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs">Ctrl</kbd> + <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs">Enter</kbd> to create
+                            <p className="text-xs text-muted-foreground mt-3 text-center">
+                                Press <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs">Ctrl</kbd> + <kbd className="px-1.5 py-0.5 bg-muted border border-border rounded text-xs">Enter</kbd> to build
                             </p>
                         </div>
                     </div>
@@ -686,30 +708,10 @@ export default function AgentsTab() {
                         <div className="max-w-6xl mx-auto space-y-8">
                             {/* Agent Templates */}
                     <div>
-                                <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-xl font-semibold flex items-center gap-2">
-                                        <Sparkles className="w-5 h-5 text-yellow-500" />
-                                        Agent Templates (20+)
-                                    </h2>
-                                    <div className="flex gap-2">
-                                        <Button
-                                            onClick={() => handleOpenVisualBuilder()}
-                                            variant="default"
-                                            className="gap-2"
-                                        >
-                                            <Workflow className="w-4 h-4" />
-                                            Create Visually
-                                        </Button>
-                                        <Button
-                                            onClick={() => setShowManualModal(true)}
-                                            variant="outline"
-                                            className="gap-2"
-                                        >
-                                            <Settings className="w-4 h-4" />
-                                            Create Manually
-                                        </Button>
-                                    </div>
-                                </div>
+                                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                                    <Sparkles className="w-5 h-5 text-yellow-500" />
+                                    Agent Templates (20+)
+                                </h2>
 
                                 {/* Category Filter */}
                                 <div className="flex flex-wrap items-center gap-2 mb-4">
