@@ -87,7 +87,7 @@ const Navbar = ({ sticky = true }: NavbarProps) => {
                                             </AnimatePresence>
                                         </>
                                     ) : link.name === "Contact" ? (
-                                        <a href="mailto:hello@celio.ai" className="link hover:text-primary transition-colors">
+                                        <a href="mailto:managercelio.ai@gmail.com" className="link hover:text-primary transition-colors">
                                             {link.name}
                                         </a>
                                     ) : (

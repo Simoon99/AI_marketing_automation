@@ -167,7 +167,7 @@ export default function AboutPage() {
                                 <ArrowRight className="w-4 h-4" />
                             </Button>
                         </Link>
-                        <a href="mailto:hello@celio.ai">
+                        <a href="mailto:managercelio.ai@gmail.com">
                             <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20 rounded-full">
                                 Contact Us
                             </Button>

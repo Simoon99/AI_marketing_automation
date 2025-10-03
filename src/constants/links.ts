@@ -13,6 +13,6 @@ export const NAV_LINKS = [
     },
     {
         name: "Contact",
-        href: "mailto:hello@celio.ai"
+        href: "mailto:managercelio.ai@gmail.com"
     },
 ];

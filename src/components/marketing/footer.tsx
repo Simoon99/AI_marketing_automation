@@ -48,7 +48,7 @@ const Footer = () => {
                         <Link href="/dashboard" className="hover:text-foreground transition-colors whitespace-nowrap">
                             Help center
                         </Link>
-                        <a href="mailto:hello@celio.ai" className="hover:text-foreground transition-colors whitespace-nowrap">
+                        <a href="mailto:managercelio.ai@gmail.com" className="hover:text-foreground transition-colors whitespace-nowrap">
                             Contact
                         </a>
                         <Link href="/pricing" className="hover:text-foreground transition-colors whitespace-nowrap">
@@ -63,7 +63,7 @@ const Footer = () => {
                         <Link href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
                             Become an Affiliate
                         </Link>
-                        <Link href="#" className="hover:text-foreground transition-colors whitespace-nowrap">
+                        <Link href="/careers" className="hover:text-foreground transition-colors whitespace-nowrap">
                             Careers
                         </Link>
                         <Link href="/privacy" className="hover:text-foreground transition-colors whitespace-nowrap">

@@ -16,6 +16,7 @@ export interface IntegrationDefinition {
   name: string;
   description: string;
   icon: string;
+  logo?: string; // URL to company logo
   category: 'communication' | 'ai' | 'email' | 'storage' | 'crm' | 'payment' | 'social' | 'productivity' | 'webhook';
   credentialFields: CredentialField[];
   actions: IntegrationAction[];
@@ -58,6 +59,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'OpenAI',
     description: 'GPT-4, GPT-3.5, DALL-E, and more',
     icon: '🤖',
+    logo: 'https://cdn.worldvectorlogo.com/logos/openai-2.svg',
     category: 'ai',
     popular: true,
     credentialFields: [
@@ -92,6 +94,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Anthropic Claude',
     description: 'Claude 3 AI models',
     icon: '🧠',
+    logo: 'https://cdn.worldvectorlogo.com/logos/anthropic.svg',
     category: 'ai',
     popular: true,
     credentialFields: [
@@ -119,6 +122,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'SendGrid',
     description: 'Email delivery service',
     icon: '📧',
+    logo: 'https://cdn.worldvectorlogo.com/logos/sendgrid-1.svg',
     category: 'email',
     popular: true,
     credentialFields: [
@@ -143,6 +147,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Gmail',
     description: 'Google Gmail integration',
     icon: '📮',
+    logo: 'https://cdn.worldvectorlogo.com/logos/gmail-icon.svg',
     category: 'email',
     popular: true,
     credentialFields: [
@@ -179,6 +184,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Slack',
     description: 'Team communication platform',
     icon: '💬',
+    logo: 'https://cdn.worldvectorlogo.com/logos/slack-new-logo.svg',
     category: 'communication',
     popular: true,
     credentialFields: [
@@ -245,6 +251,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Twilio',
     description: 'SMS and voice communication',
     icon: '📱',
+    logo: 'https://cdn.worldvectorlogo.com/logos/twilio.svg',
     category: 'communication',
     popular: true,
     credentialFields: [
@@ -271,6 +278,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Notion',
     description: 'Workspace and documentation',
     icon: '📝',
+    logo: 'https://cdn.worldvectorlogo.com/logos/notion-2.svg',
     category: 'productivity',
     popular: true,
     credentialFields: [
@@ -294,6 +302,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Google Sheets',
     description: 'Spreadsheet management',
     icon: '📊',
+    logo: 'https://cdn.worldvectorlogo.com/logos/google-sheets.svg',
     category: 'productivity',
     popular: true,
     credentialFields: [
@@ -319,6 +328,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Airtable',
     description: 'Database and spreadsheet hybrid',
     icon: '🗃️',
+    logo: 'https://cdn.worldvectorlogo.com/logos/airtable.svg',
     category: 'productivity',
     popular: true,
     credentialFields: [
@@ -344,6 +354,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'HubSpot',
     description: 'CRM and marketing automation',
     icon: '🎯',
+    logo: 'https://cdn.worldvectorlogo.com/logos/hubspot.svg',
     category: 'crm',
     popular: true,
     credentialFields: [
@@ -367,6 +378,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Mailchimp',
     description: 'Email marketing platform',
     icon: '🐵',
+    logo: 'https://cdn.worldvectorlogo.com/logos/mailchimp-freddie-icon.svg',
     category: 'crm',
     popular: false,
     credentialFields: [
@@ -391,6 +403,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Twitter/X',
     description: 'Social media platform',
     icon: '🐦',
+    logo: 'https://cdn.worldvectorlogo.com/logos/twitter-6.svg',
     category: 'social',
     popular: true,
     credentialFields: [
@@ -415,6 +428,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'LinkedIn',
     description: 'Professional networking platform',
     icon: '💼',
+    logo: 'https://cdn.worldvectorlogo.com/logos/linkedin-icon-2.svg',
     category: 'social',
     popular: false,
     credentialFields: [
@@ -438,6 +452,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Stripe',
     description: 'Payment processing',
     icon: '💳',
+    logo: 'https://cdn.worldvectorlogo.com/logos/stripe-4.svg',
     category: 'payment',
     popular: true,
     credentialFields: [
@@ -460,6 +475,7 @@ export const INTEGRATIONS: IntegrationDefinition[] = [
     name: 'Shopify',
     description: 'E-commerce platform',
     icon: '🛍️',
+    logo: 'https://cdn.worldvectorlogo.com/logos/shopify.svg',
     category: 'payment',
     popular: false,
     credentialFields: [

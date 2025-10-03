@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Settings, Brain, CreditCard, User, X, Plug, ChevronRight } from "lucide-react";
 import { cn } from "@/lib";
 import { IntegrationsModal } from "./integrations-modal";
+import { INTEGRATIONS } from "@/lib/types/integrations";
+import Image from "next/image";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -45,28 +47,7 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
     const renderSectionContent = () => {
         switch (activeSection) {
             case 'integrations':
-                const integrations = [
-                    { name: 'OpenAI', emoji: '🤖', connected: false },
-                    { name: 'SendGrid', emoji: '📧', connected: false },
-                    { name: 'Slack', emoji: '💬', connected: false },
-                    { name: 'Gmail', emoji: '✉️', connected: false },
-                    { name: 'Google Sheets', emoji: '📊', connected: false },
-                    { name: 'Airtable', emoji: '🗂️', connected: false },
-                    { name: 'HubSpot', emoji: '🎯', connected: false },
-                    { name: 'Stripe', emoji: '💳', connected: false },
-                    { name: 'Twilio', emoji: '📱', connected: false },
-                    { name: 'Mailchimp', emoji: '🐵', connected: false },
-                    { name: 'LinkedIn', emoji: '💼', connected: false },
-                    { name: 'Twitter', emoji: '🐦', connected: false },
-                    { name: 'Facebook', emoji: '📘', connected: false },
-                    { name: 'Instagram', emoji: '📸', connected: false },
-                    { name: 'Shopify', emoji: '🛍️', connected: false },
-                    { name: 'WooCommerce', emoji: '🛒', connected: false },
-                    { name: 'Zapier', emoji: '⚡', connected: false },
-                    { name: 'Make', emoji: '🔧', connected: false },
-                    { name: 'Notion', emoji: '📝', connected: false },
-                    { name: 'Trello', emoji: '📋', connected: false },
-                ];
+                const integrations = INTEGRATIONS;
                 
                 if (selectedIntegration) {
                     // Show integration settings inline
@@ -82,7 +63,19 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
                             </button>
                             
                             <div className="flex items-center gap-3 mb-6">
-                                <span className="text-4xl">{integration?.emoji}</span>
+                                {integration?.logo ? (
+                                    <div className="w-12 h-12 relative flex items-center justify-center">
+                                        <Image 
+                                            src={integration.logo} 
+                                            alt={integration.name}
+                                            width={48}
+                                            height={48}
+                                            className="object-contain"
+                                        />
+                                    </div>
+                                ) : (
+                                    <span className="text-4xl">{integration?.icon}</span>
+                                )}
                                 <div>
                                     <h3 className="text-2xl font-bold">{integration?.name}</h3>
                                     <p className="text-sm text-muted-foreground">Configure API credentials</p>
@@ -142,15 +135,24 @@ export default function SettingsDropdown({ isCollapsed = false }: SettingsDropdo
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                             {integrations.map((integration) => (
                                 <button
-                                    key={integration.name}
+                                    key={integration.id}
                                     onClick={() => setSelectedIntegration(integration.name)}
                                     className="flex flex-col items-center gap-2 p-4 border border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-all cursor-pointer group"
                                 >
-                                    <span className="text-3xl">{integration.emoji}</span>
-                                    <span className="text-xs font-medium text-center">{integration.name}</span>
-                                    {integration.connected && (
-                                        <div className="w-2 h-2 rounded-full bg-green-500" />
+                                    {integration.logo ? (
+                                        <div className="w-12 h-12 relative flex items-center justify-center">
+                                            <Image 
+                                                src={integration.logo} 
+                                                alt={integration.name}
+                                                width={48}
+                                                height={48}
+                                                className="object-contain"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <span className="text-3xl">{integration.icon}</span>
                                     )}
+                                    <span className="text-xs font-medium text-center">{integration.name}</span>
                                 </button>
                             ))}
                         </div>
