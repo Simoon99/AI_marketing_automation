@@ -541,22 +541,67 @@ export function VisualAgentBuilder({
   };
 
   const handleSaveWorkflow = () => {
-    // Convert visual nodes back to agent config
-    const steps = nodes
-      .filter(node => node.id !== 'trigger')
-      .map(node => ({
-        type: node.data.type,
-        action: node.data.action || node.data.label,
+    // Convert visual workflow to n8n-style graph structure
+    const workflowNodes = nodes.map(node => ({
+      id: node.id,
+      type: node.data.type,
+      name: node.data.label,
+      position: node.position,
+      parameters: {
+        action: node.data.action,
         integration: node.data.integration,
-        params: node.data.params || {},
-      }));
+        ...node.data.params,
+      },
+      // Node-specific configuration
+      disabled: node.data.disabled || false,
+      notes: node.data.notes || '',
+      // Execution settings
+      continueOnFail: node.data.continueOnFail || false,
+      retryOnFail: node.data.retryOnFail || false,
+      maxTries: node.data.maxTries || 3,
+      waitBetweenTries: node.data.waitBetweenTries || 1000,
+      // Conditional execution
+      executeOnce: node.data.executeOnce || false,
+      alwaysOutputData: node.data.alwaysOutputData || false,
+      onError: node.data.onError || 'stopWorkflow', // stopWorkflow, continueRegularOutput, continueErrorOutput
+    }));
+
+    const workflowEdges = edges.map(edge => ({
+      source: edge.source,
+      target: edge.target,
+      sourceHandle: edge.sourceHandle,
+      targetHandle: edge.targetHandle,
+      // Edge-specific configuration
+      type: edge.data?.type || 'default',
+      condition: edge.data?.condition, // For conditional branches
+    }));
 
     const config = {
       name: agentName,
       description: agentDescription,
       trigger_type: 'manual',
-      steps,
-      integrations: [...new Set(steps.map(s => s.integration).filter(Boolean))],
+      // NEW: Graph-based workflow structure (n8n-style)
+      workflow: {
+        nodes: workflowNodes,
+        edges: workflowEdges,
+        settings: {
+          executionOrder: 'v1', // v1 = graph-based execution
+          saveExecutionProgress: true,
+          saveManualExecutions: true,
+          errorWorkflow: '',
+          timezone: 'America/New_York',
+        },
+      },
+      // LEGACY: Keep for backward compatibility with old agents
+      steps: nodes
+        .filter(node => node.id !== 'trigger')
+        .map(node => ({
+          type: node.data.type,
+          action: node.data.action || node.data.label,
+          integration: node.data.integration,
+          params: node.data.params || {},
+        })),
+      integrations: [...new Set(workflowNodes.map(n => n.parameters.integration).filter(Boolean))],
     };
 
     onSave(config);

@@ -1,11 +1,13 @@
 // @deno-types="https://esm.sh/@supabase/supabase-js@2/dist/module/index.d.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { getIntegrationHandler } from '../_shared/integrations.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { getIntegrationHandler } from '../_shared/integrations.ts';
+import { WorkflowEngine } from './workflow-engine.ts';
+import { DefaultNodeExecutor } from './node-executor.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
 
 interface ExecuteAgentRequest {
   agent_id: string;
@@ -14,35 +16,38 @@ interface ExecuteAgentRequest {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    return new Response('ok', { headers: corsHeaders });
   }
 
-  const startTime = Date.now()
+  const startTime = Date.now();
 
   try {
-    const authHeader = req.headers.get('Authorization')
+    const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('No authorization header')
+      throw new Error('No authorization header');
     }
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       { global: { headers: { Authorization: authHeader } } }
-    )
+    );
 
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseClient.auth.getUser();
     if (userError || !user) {
-      throw new Error('Unauthorized')
+      throw new Error('Unauthorized');
     }
 
-    const { agent_id, input }: ExecuteAgentRequest = await req.json()
+    const { agent_id, input }: ExecuteAgentRequest = await req.json();
 
     if (!agent_id) {
-      throw new Error('agent_id is required')
+      throw new Error('agent_id is required');
     }
 
-    console.log(`🚀 Executing agent: ${agent_id}`)
+    console.log(`🚀 Executing agent: ${agent_id}`);
 
     // Get agent from database
     const { data: agent, error: agentError } = await supabaseClient
@@ -50,14 +55,14 @@ Deno.serve(async (req) => {
       .select('*')
       .eq('id', agent_id)
       .eq('user_id', user.id)
-      .single()
+      .single();
 
     if (agentError || !agent) {
-      throw new Error('Agent not found')
+      throw new Error('Agent not found');
     }
 
     if (agent.status !== 'active') {
-      throw new Error(`Agent is ${agent.status}`)
+      throw new Error(`Agent is ${agent.status}`);
     }
 
     // Create execution record
@@ -70,63 +75,110 @@ Deno.serve(async (req) => {
         input: input || null,
       })
       .select()
-      .single()
+      .single();
 
     if (execError) {
-      throw new Error('Failed to create execution record')
+      throw new Error('Failed to create execution record');
     }
 
-    console.log(`📝 Execution created: ${execution.id}`)
+    console.log(`📝 Execution created: ${execution.id}`);
 
     try {
       // Fetch user integrations
-      const { data: userIntegrations, error: integrationsError } = await supabaseClient
-        .from('user_integrations')
-        .select('*')
-        .eq('status', 'active')
+      const { data: userIntegrations, error: integrationsError } =
+        await supabaseClient
+          .from('user_integrations')
+          .select('*')
+          .eq('status', 'active');
 
       if (integrationsError) {
-        console.warn('Failed to fetch integrations:', integrationsError)
+        console.warn('Failed to fetch integrations:', integrationsError);
       }
 
-      const integrationsMap = new Map()
+      const integrationsMap = new Map();
       if (userIntegrations) {
         userIntegrations.forEach((integration: any) => {
-          integrationsMap.set(integration.provider, integration.credentials)
-        })
+          integrationsMap.set(integration.provider, integration.credentials);
+        });
       }
 
-      // Execute agent steps
-      const config = agent.config
-      let stepOutput: any = input || {}
+      const config = agent.config;
+      let output: any;
 
-      for (let i = 0; i < config.steps.length; i++) {
-        const step = config.steps[i]
-        console.log(`  Step ${i + 1}/${config.steps.length}: ${step.type} - ${step.action}`)
+      // Check if this is a new workflow-based agent or legacy steps-based agent
+      if (config.workflow && config.workflow.nodes && config.workflow.edges) {
+        console.log('📊 Executing graph-based workflow (n8n-style)');
 
-        // Execute step based on type
-        if (step.type === 'fetch') {
-          stepOutput = await executeFetchStep(step, stepOutput, integrationsMap)
-        } else if (step.type === 'process') {
-          stepOutput = await executeProcessStep(step, stepOutput, config.llm, integrationsMap)
-        } else if (step.type === 'action') {
-          stepOutput = await executeActionStep(step, stepOutput, integrationsMap)
+        // NEW: Use the graph-based workflow engine
+        const nodeExecutor = new DefaultNodeExecutor();
+        const engine = new WorkflowEngine(
+          config.workflow,
+          integrationsMap,
+          nodeExecutor,
+          input
+        );
+
+        const executionContext = await engine.execute();
+
+        // Get the final output from the last executed node
+        const executedNodeIds = Object.keys(executionContext).filter(
+          (key) => key !== 'trigger'
+        );
+        const lastNodeId = executedNodeIds[executedNodeIds.length - 1];
+        output = executionContext[lastNodeId]?.output || executionContext;
+      } else if (config.steps && Array.isArray(config.steps)) {
+        console.log('📝 Executing legacy steps-based workflow');
+
+        // LEGACY: Use the old linear execution for backward compatibility
+        let stepOutput: any = input || {};
+
+        for (let i = 0; i < config.steps.length; i++) {
+          const step = config.steps[i];
+          console.log(
+            `  Step ${i + 1}/${config.steps.length}: ${step.type} - ${step.action}`
+          );
+
+          // Execute step based on type
+          if (step.type === 'fetch') {
+            stepOutput = await executeFetchStep(
+              step,
+              stepOutput,
+              integrationsMap
+            );
+          } else if (step.type === 'process') {
+            stepOutput = await executeProcessStep(
+              step,
+              stepOutput,
+              config.llm,
+              integrationsMap
+            );
+          } else if (step.type === 'action') {
+            stepOutput = await executeActionStep(
+              step,
+              stepOutput,
+              integrationsMap
+            );
+          }
         }
+
+        output = stepOutput;
+      } else {
+        throw new Error('Invalid agent configuration: missing workflow or steps');
       }
 
-      const duration = Date.now() - startTime
+      const duration = Date.now() - startTime;
 
       // Update execution as success
       await supabaseClient
         .from('agent_executions')
         .update({
           status: 'success',
-          output: stepOutput,
+          output: output,
           duration_ms: duration,
         })
-        .eq('id', execution.id)
+        .eq('id', execution.id);
 
-      console.log(`✅ Agent executed successfully in ${duration}ms`)
+      console.log(`✅ Agent executed successfully in ${duration}ms`);
 
       return new Response(
         JSON.stringify({
@@ -134,7 +186,7 @@ Deno.serve(async (req) => {
           execution: {
             ...execution,
             status: 'success',
-            output: stepOutput,
+            output: output,
             duration_ms: duration,
           },
         }),
@@ -142,9 +194,9 @@ Deno.serve(async (req) => {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200,
         }
-      )
+      );
     } catch (stepError: any) {
-      const duration = Date.now() - startTime
+      const duration = Date.now() - startTime;
 
       // Update execution as failed
       await supabaseClient
@@ -154,12 +206,12 @@ Deno.serve(async (req) => {
           error: stepError.message,
           duration_ms: duration,
         })
-        .eq('id', execution.id)
+        .eq('id', execution.id);
 
-      throw stepError
+      throw stepError;
     }
   } catch (error: any) {
-    console.error('❌ Error:', error.message)
+    console.error('❌ Error:', error.message);
     return new Response(
       JSON.stringify({
         success: false,
@@ -169,61 +221,75 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       }
-    )
+    );
   }
-})
+});
 
-// Step execution functions
-async function executeFetchStep(step: any, context: any, integrations: Map<string, any>): Promise<any> {
-  console.log(`    Fetching from ${step.integration}...`)
-  
+// ==================== LEGACY FUNCTIONS FOR BACKWARD COMPATIBILITY ====================
+
+async function executeFetchStep(
+  step: any,
+  context: any,
+  integrations: Map<string, any>
+): Promise<any> {
+  console.log(`    Fetching from ${step.integration}...`);
+
   // Check if user has the required integration
   if (step.integration && !integrations.has(step.integration)) {
-    throw new Error(`Integration ${step.integration} not configured. Please add it in Manage Integrations.`)
+    throw new Error(
+      `Integration ${step.integration} not configured. Please add it in Manage Integrations.`
+    );
   }
 
   // Get the integration handler
-  const handler = getIntegrationHandler(step.integration, step.action)
-  
+  const handler = getIntegrationHandler(step.integration, step.action);
+
   if (!handler) {
-    throw new Error(`Action ${step.action} not supported for ${step.integration}`)
+    throw new Error(`Action ${step.action} not supported for ${step.integration}`);
   }
 
   // Get credentials
-  const credentials = integrations.get(step.integration)
+  const credentials = integrations.get(step.integration);
 
   // Execute the integration
   try {
-    const result = await handler(credentials, step.params || {}, context)
-    return result
+    const result = await handler(credentials, step.params || {}, context);
+    return result;
   } catch (error: any) {
-    console.error(`Integration error:`, error)
-    throw new Error(`Failed to execute ${step.integration}.${step.action}: ${error.message}`)
+    console.error(`Integration error:`, error);
+    throw new Error(
+      `Failed to execute ${step.integration}.${step.action}: ${error.message}`
+    );
   }
 }
 
-async function executeProcessStep(step: any, context: any, llmConfig?: any, integrations?: Map<string, any>): Promise<any> {
-  console.log(`    Processing data...`)
+async function executeProcessStep(
+  step: any,
+  context: any,
+  llmConfig?: any,
+  integrations?: Map<string, any>
+): Promise<any> {
+  console.log(`    Processing data...`);
 
   // If LLM processing is needed
   if (step.params?.use_llm || llmConfig) {
     // Try to get OpenAI API key from user integrations first, fallback to env
-    let openaiApiKey = integrations?.get('openai')?.api_key
+    let openaiApiKey = integrations?.get('openai')?.api_key;
     if (!openaiApiKey) {
-      openaiApiKey = Deno.env.get('OPENAI_API_KEY')
-    }
-    
-    if (!openaiApiKey) {
-      throw new Error('OpenAI API key not configured. Please add OpenAI integration.')
+      openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     }
 
-    const prompt = step.params?.llm_prompt || 'Process this data'
-    const contextStr = JSON.stringify(context, null, 2)
+    if (!openaiApiKey) {
+      throw new Error('OpenAI API key not configured. Please add OpenAI integration.');
+    }
+
+    const prompt = step.params?.llm_prompt || 'Process this data';
+    const contextStr = JSON.stringify(context, null, 2);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        Authorization: `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -240,53 +306,61 @@ async function executeProcessStep(step: any, context: any, llmConfig?: any, inte
         ],
         temperature: llmConfig?.temperature || 0.7,
       }),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error('LLM processing failed')
+      throw new Error('LLM processing failed');
     }
 
-    const data = await response.json()
-    const llmOutput = data.choices[0].message.content
+    const data = await response.json();
+    const llmOutput = data.choices[0].message.content;
 
     return {
       ...context,
       processed_data: llmOutput,
       llm_response: llmOutput,
-    }
+    };
   }
 
   // Simple processing without LLM
   return {
     ...context,
     processed: true,
-  }
+  };
 }
 
-async function executeActionStep(step: any, context: any, integrations: Map<string, any>): Promise<any> {
-  console.log(`    Executing action: ${step.action}...`)
+async function executeActionStep(
+  step: any,
+  context: any,
+  integrations: Map<string, any>
+): Promise<any> {
+  console.log(`    Executing action: ${step.action}...`);
 
   // Check if user has the required integration
   if (step.integration && !integrations.has(step.integration)) {
-    throw new Error(`Integration ${step.integration} not configured. Please add it in Manage Integrations.`)
+    throw new Error(
+      `Integration ${step.integration} not configured. Please add it in Manage Integrations.`
+    );
   }
 
   // Get the integration handler
-  const handler = getIntegrationHandler(step.integration, step.action)
-  
+  const handler = getIntegrationHandler(step.integration, step.action);
+
   if (!handler) {
-    throw new Error(`Action ${step.action} not supported for ${step.integration}`)
+    throw new Error(`Action ${step.action} not supported for ${step.integration}`);
   }
 
   // Get credentials
-  const credentials = integrations.get(step.integration)
+  const credentials = integrations.get(step.integration);
 
   // Execute the integration
   try {
-    const result = await handler(credentials, step.params || {}, context)
-    return result
+    const result = await handler(credentials, step.params || {}, context);
+    return result;
   } catch (error: any) {
-    console.error(`Integration error:`, error)
-    throw new Error(`Failed to execute ${step.integration}.${step.action}: ${error.message}`)
+    console.error(`Integration error:`, error);
+    throw new Error(
+      `Failed to execute ${step.integration}.${step.action}: ${error.message}`
+    );
   }
 }
